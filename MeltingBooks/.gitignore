@@ -15,4 +15,4 @@
 local.properties
 /build
 # Firebase credentials
-MyApplication/app/src/main/assets/*.json
+MeltingBooks/app/src/main/assets/*.json
