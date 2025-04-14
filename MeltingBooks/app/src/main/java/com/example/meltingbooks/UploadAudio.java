@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -32,7 +34,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.myapplication.R;
+import com.example.meltingbooks.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -48,6 +50,8 @@ import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.example.meltingbooks.BuildConfig;
 
 public class UploadAudio extends AppCompatActivity {
     private String apiKey;  // apiKey는 이제 onCreate()에서 초기화
@@ -79,8 +83,7 @@ public class UploadAudio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        // apiKey는 onCreate에서 초기화
-        apiKey = getString(R.string.openai_api_key);
+        apiKey = BuildConfig.OPENAI_API_KEY;
 
         ///안드로이드 6.0버전 이상인지 체크해서 퍼미션
         if(Build.VERSION.SDK_INT >= 23){
@@ -151,8 +154,29 @@ public class UploadAudio extends AppCompatActivity {
             // 해시태그 기능 구현
         });
 
+        // EditText에 입력 감지하는 TextWatcher 추가
+        etInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // 입력된 텍스트 길이가 5자 이상이면 버튼 활성화
+                if (s.length() >= 5) {
+                    btnSummarize.setVisibility(View.VISIBLE);  // 입력 5자 이상 → 버튼 보이기
+                } else {
+                    btnSummarize.setVisibility(View.GONE);  // 5자 미만 → 버튼 숨기기
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         // 요약하기 버튼 클릭 리스너
         btnSummarize.setOnClickListener(v -> {
+            //요약하기 버튼 숨기기
+            btnSummarize.setVisibility(View.GONE);
             // 요약 중 이미지를 보이게
             summarizingImageView.setVisibility(View.VISIBLE);
 
@@ -161,19 +185,20 @@ public class UploadAudio extends AppCompatActivity {
             callAPI(inputText);  // ChatGPT API 호출
         });
 
-
         /// RecognizerIntent 생성
         intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,getPackageName()); // 여분의 키
-        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR"); // 언어 설정
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toString()); // 기기의 기본 언어로 설정
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR"); // 언어 설정
+        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toString()); // 기기의 기본 언어로 설정
 
 
         // btnRecord 클릭 리스너에서 micON 이미지 뷰를 표시
         btnRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnSummarize.setVisibility(View.GONE);
                 initSpeechRecognizer();
                 speechRecognizer = SpeechRecognizer.createSpeechRecognizer(UploadAudio.this); // 새 SpeechRecognizer 를 만드는 팩토리 메서드
                 speechRecognizer.setRecognitionListener(listener); // 리스너 설정
@@ -195,7 +220,6 @@ public class UploadAudio extends AppCompatActivity {
         public void onReadyForSpeech(Bundle params) {
             showSpeechRecognitionUI();
             // 말하기 시작할 준비가되면 호출
-            Toast.makeText(getApplicationContext(),"음성인식 시작",Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -268,6 +292,7 @@ public class UploadAudio extends AppCompatActivity {
                     results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             if (matches != null && !matches.isEmpty()) {
                 etInput.setText(matches.get(0)); // 인식된 첫 번째 텍스트를 etInput에 설정
+                etInput.setSelection(etInput.getText().length()); // 🔥 커서를 맨 뒤로 이동
                 // 음성 인식이 완료되면 요약하기 버튼을 보이게 설정
                 btnSummarize.setVisibility(View.VISIBLE);
             }
@@ -344,16 +369,25 @@ public class UploadAudio extends AppCompatActivity {
         try {
             object.put("model", "gpt-3.5-turbo");
             JSONArray messagesArray = new JSONArray();
+
+            // 시스템 역할 추가
+            JSONObject systemMessage = new JSONObject();
+            systemMessage.put("role", "system");
+            systemMessage.put("content", "You are a helpful assistant that summarizes text.");
+            messagesArray.put(systemMessage);
+
+            // 사용자 입력 추가
             JSONObject messageObj = new JSONObject();
             messageObj.put("role", "user");
-            messageObj.put("content", question);
+            messageObj.put("content", "다음 내용을 사용자의 감상을 반영하여 요약해줘:\\n" + question);  // 명확한 요청 추가
             messagesArray.put(messageObj);
             object.put("messages", messagesArray);
+            object.put("temperature", 0.7); // 다양성을 조절하는 옵션
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        RequestBody body = RequestBody.create(object.toString(), MediaType.get("application/json"));
+        RequestBody body = RequestBody.create(object.toString(), MediaType.get("application/json; charset=utf-8"));
         request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 .header("Authorization", "Bearer " + apiKey)  // apiKey를 사용
@@ -372,25 +406,28 @@ public class UploadAudio extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                Log.d("API_RESPONSE", responseBody);  // 응답 로깅
+
+
                 if (response.isSuccessful()) {
                     try {
-                        String responseBody = response.body().string();
                         JSONObject jsonResponse = new JSONObject(responseBody);
                         JSONArray choices = jsonResponse.getJSONArray("choices");
                         String summarizedText = choices.getJSONObject(0).getJSONObject("message").getString("content");
 
-                        // 응답을 받아서 요약된 텍스트를 EditText에 설정
                         runOnUiThread(() -> {
                             etInput.setText(summarizedText);
-                            summarizingImageView.setVisibility(View.GONE); // 요약 완료 후 이미지 숨기기
+                            summarizingImageView.setVisibility(View.GONE);
+                            btnSummarize.setVisibility(View.VISIBLE);
                         });
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
                     runOnUiThread(() -> {
-                        summarizingImageView.setVisibility(View.GONE); // 요약 중 이미지 숨기기
-                        Toast.makeText(UploadAudio.this, "API 호출 오류", Toast.LENGTH_SHORT).show();
+                        summarizingImageView.setVisibility(View.GONE);
+                        Toast.makeText(UploadAudio.this, "API 호출 오류: " + responseBody, Toast.LENGTH_SHORT).show();
                     });
                 }
             }
