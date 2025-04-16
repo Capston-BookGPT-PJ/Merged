@@ -4,7 +4,7 @@
 
 <details><summary>자세히</summary>
 
-### 0. ChatGPT API 연결
+### 1. ChatGPT API 연결
 
 1. #### 맨 처음, `C:\MeltingBooks\` 위치에 있는 local.properties에 API 키를 추가 한다.
 
@@ -17,10 +17,14 @@ local.properties 열어서 아래 줄 그대로 맨 마지막 줄에 추가하�
 OPENAI_API_KEY=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
 
 
-### 1. Google Firebase Console API 연결
+
+
+### 2. Google Firebase Console API 연결
 1. #### 맨 처음, 아래 service.account.json파일을 `C:\MeltingBooks/app/src/main/assets/` 위치에 추가 한다.
 
    [service-account.json.json](https://github.com/user-attachments/files/19771882/service-account.json.json)
+
+
 
 2. #### google.service.json 파일을 C:\MeltingBooks\app'  위치에 추가한다.
 
