@@ -11,7 +11,9 @@
  ![image](https://github.com/user-attachments/assets/886c04a9-4cbb-4366-a7a9-0ec56d4c7ba8)
 
 <API 키--노출주의!!!>
+
 local.properties 열어서 아래 줄 그대로 맨 마지막 줄에 추가하기 
+
 OPENAI_API_KEY=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
 
 
