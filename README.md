@@ -30,4 +30,5 @@ OPENAI_API_KEY=sk-proj-DNGjkWnzG5iK6NAlU7pfIwWPwNGZbNAsrpFO1saZu3zx9bHQLouKjVyyg
 
 ![image](https://github.com/user-attachments/assets/27abe55c-9e54-4618-8e33-b08479579851)
 
-[google-services.json]
+[google-services.json](https://github.com/user-attachments/files/19772190/google-services.json)
+
