@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +117,7 @@ public class FeedActivity extends AppCompatActivity {
                     // 화면 전환
                     int id = item.getItemId();
                     if (id == R.id.Browser) {
-                        startActivity(new Intent(FeedActivity.this, Browser.class));
+                        startActivity(new Intent(FeedActivity.this, BrowserActivty.class));
                     } else if (id == R.id.Feed) {
                         return true;  // 현재 화면 유지
                     }

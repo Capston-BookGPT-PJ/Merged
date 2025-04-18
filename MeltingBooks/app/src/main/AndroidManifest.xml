@@ -32,7 +32,7 @@
             android:windowSoftInputMode="adjustResize"
             android:exported="true" />
         <activity
-            android:name="com.example.meltingbooks.Browser"
+            android:name="com.example.meltingbooks.BrowserActivty"
             android:windowSoftInputMode="adjustResize"
             android:exported="true" />
         <!-- 기존의 MainActivity 설정 -->
