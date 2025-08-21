@@ -190,12 +190,16 @@ public class BrowseActivity extends BaseActivity {
         for (String tag : hashtags) {
             TextView tagView = new TextView(this);
             tagView.setText(tag);
+            // 글자 수에 맞게 사이즈 조절되도록
+            tagView.setMinWidth(0);
+            tagView.setMinEms(0);
+            tagView.setMaxWidth(Integer.MAX_VALUE);
             //텍스트 디자인
             tagView.setTextSize(15);
             tagView.setTextColor(ContextCompat.getColor(this, R.color.text_blue));
             tagView.setGravity(Gravity.CENTER);
             //해시태그 디자인
-            tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag_background));
+            tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag1));
             tagView.setPadding(8, 8, 8, 8); //해시태그 간격
             //레이아웃
             FlexboxLayout.LayoutParams params = new FlexboxLayout.LayoutParams(
@@ -203,7 +207,7 @@ public class BrowseActivity extends BaseActivity {
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
 
-            params.setMargins(8, 8, 8, 8); //해시태그 간 간격
+            params.setMargins(12, 20, 12, 20); //해시태그 간 간격
             tagView.setLayoutParams(params);
 
 
@@ -212,11 +216,11 @@ public class BrowseActivity extends BaseActivity {
                 v.setSelected(!selected);
                 if (!selected) {
                     // 선택 상태로 변경
-                    tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag_click_background));
+                    tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag2));
                     tagView.setTextColor(ContextCompat.getColor(this, R.color.white));
                 } else {
                     // 선택 해제 상태로 변경
-                    tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag_background));
+                    tagView.setBackground(ContextCompat.getDrawable(this, R.drawable.hashtag1));
                     tagView.setTextColor(ContextCompat.getColor(this, R.color.text_blue));
                 }
             });
