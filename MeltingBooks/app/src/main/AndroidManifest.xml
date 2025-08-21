@@ -35,6 +35,50 @@
             android:name=".UploadAudio"
             android:windowSoftInputMode="adjustResize"
             android:exported="true" />
+        <activity
+            android:name=".BrowseActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <!-- 구현 전
+        <activity
+            android:name=".CalendarActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+            -->
+        <activity
+            android:name=".GroupActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <activity
+            android:name=".GroupWriteActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <activity
+            android:name=".GroupJoinActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <activity
+            android:name=".GroupNewCreateActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <activity
+            android:name=".GroupProfileActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <activity
+            android:name=".GroupCommentActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
+        <!--
+        <activity
+            android:name=".GroupDetailActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />-->
+
+        <activity
+            android:name=".SearchActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.meltingbooks;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,13 @@ public class BrowseUsersAdapter extends RecyclerView.Adapter<BrowseUsersAdapter.
         holder.userName.setText(user.getName());
         holder.userIntro.setText(user.getIntro());
         holder.userImage.setImageResource(user.getImageResId());
+
+        // ⭐ userImage 클릭 이벤트 추가
+        holder.userImage.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+            // intent.putExtra("userId", user.getId()); // 필요하면 유저 ID 전달
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

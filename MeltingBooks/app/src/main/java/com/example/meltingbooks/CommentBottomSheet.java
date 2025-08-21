@@ -26,6 +26,29 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
     private List<CommentItem> commentList;
     private OnCommentAddedListener onCommentAddedListener;
 
+    //feed와 group 구분 코드
+
+    private String postId;
+    private String postType; // "feed" 또는 "group"
+
+    public static CommentBottomSheet newInstance(String postId, String postType) {
+        CommentBottomSheet fragment = new CommentBottomSheet();
+        Bundle args = new Bundle();
+        args.putString("postId", postId);
+        args.putString("postType", postType);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            postId = getArguments().getString("postId");
+            postType = getArguments().getString("postType");
+        }
+    }
+
     public interface OnCommentAddedListener {
         void onCommentAdded(int commentCount);
     }

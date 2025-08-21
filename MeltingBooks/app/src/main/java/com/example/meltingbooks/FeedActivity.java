@@ -51,6 +51,9 @@ public class FeedActivity extends AppCompatActivity {
             }
         });
 
+
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
 
@@ -85,17 +88,17 @@ public class FeedActivity extends AppCompatActivity {
 
             //추후 서버 연결해서 바꾸는 식으로 조정.
             feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!------------------------------------------------------------------------------------------------------------------------------------------------------------------------", "2025-03-10", null));
-            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09",null));
-            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08",null));
-            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10",null));
-            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09",null));
-            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08",null));
-            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10",null));
-            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09",null));
-            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08",null));
-            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10",null));
-            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09",null));
-            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08",null));
+            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09", null));
+            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08", null));
+            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10", null));
+            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09", null));
+            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08", null));
+            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10", null));
+            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09", null));
+            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08", null));
+            feedList.add(new FeedItem("Alice", "오늘 읽은 책 너무 재밌었어!", "2025-03-10", null));
+            feedList.add(new FeedItem("Bob", "독서가 정말 힘이 되네.", "2025-03-09", null));
+            feedList.add(new FeedItem("Charlie", "이번 책도 완독했다!", "2025-03-08", null));
 
             feedAdapter = new FeedAdapter(this, feedList);
             feedRecyclerView.setAdapter(feedAdapter);
@@ -137,17 +140,37 @@ public class FeedActivity extends AppCompatActivity {
                 }*/
             });
 
-            bottomNavigationView.setOnItemSelectedListener(item -> {
-                int position = getSelectedPosition(item.getItemId());
-                if (position >= 0 && iconPositions != null) {
-                    gradientCircle.animate().x(iconPositions[position]).setDuration(300).start();
+            bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int itemId = item.getItemId();
+
+                    int position = getSelectedPosition(itemId);
+                    if (position >= 0 && iconPositions != null) {
+                        gradientCircle.animate().x(iconPositions[position]).setDuration(300).start();
+                    }
+
+                    if (itemId == R.id.Feed) {
+                        return true;
+                    } else if (itemId == R.id.Browser) {
+                        startActivity(new Intent(FeedActivity.this, BrowseActivity.class));
+                        return true;
+                    } else if (itemId == R.id.Calendar) {
+                        // startActivity(new Intent(FeedActivity.this, CalendarActivity.class));
+                        return true;
+                    } else if (itemId == R.id.Group) {
+                        startActivity(new Intent(FeedActivity.this, GroupActivity.class));
+                        return true;
+                    } else if (itemId == R.id.Profile) {
+                        // startActivity(new Intent(FeedActivity.this, ProfileActivity.class));
+                        return true;
+                    }
+
+                    return false;
                 }
-                return true;
             });
         }
-
     }
-
     //하단 메뉴 위치 설정
     private int getSelectedPosition(int itemId) {
         if (itemId == R.id.Feed) {
@@ -164,4 +187,5 @@ public class FeedActivity extends AppCompatActivity {
             return -1;
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.example.meltingbooks;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,13 @@ public class GroupMemberAdapter extends RecyclerView.Adapter<GroupMemberAdapter.
             holder.myself.setVisibility(View.GONE);
             holder.groupCheckBoxImage.setVisibility(View.VISIBLE);
         }
+
+        // ⭐ memberImage 클릭 이벤트 추가
+        holder.memberImage.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+            // intent.putExtra("memberId", member.getId()); // 필요하면 멤버 ID 전달
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

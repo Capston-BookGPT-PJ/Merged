@@ -99,6 +99,10 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 
     implementation ("androidx.emoji2:emoji2:1.4.0")
+    implementation ("org.jsoup:jsoup:1.15.4")
+
+    implementation ("com.google.android.flexbox:flexbox:3.0.0")
+
 }
 
 // Firebase 설정 적용
