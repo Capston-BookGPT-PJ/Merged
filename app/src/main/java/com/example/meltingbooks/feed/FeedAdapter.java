@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,14 +33,21 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+//피드 갱신용
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
 
     private final List<FeedItem> feedList;
     private final Context context;
+    private final ActivityResultLauncher<Intent> detailLauncher;
 
-    public FeedAdapter(Context context, List<FeedItem> feedList) {
+    //피드 갱신 추가
+    public FeedAdapter(Context context, List<FeedItem> feedList, ActivityResultLauncher<Intent> detailLauncher) {
         this.context = context;
         this.feedList = feedList;
+        this.detailLauncher = detailLauncher;
     }
 
     @NonNull
@@ -214,11 +222,12 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         //더보기
         holder.readMore.setOnClickListener(v -> {
             Context context = v.getContext();
-            Intent intent = new Intent(context, FeedDetailActivity.class);
+            Intent intent = new Intent(v.getContext(), FeedDetailActivity.class);
 
             // Adapter의 필드를 안전하게 사용
             intent.putExtra("postId", item.getPostId());
-            context.startActivity(intent);
+            //context.startActivity(intent);
+            detailLauncher.launch(intent);
         });
     }
 

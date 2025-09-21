@@ -95,7 +95,10 @@ public class FeedItem {
     public String getReviewContent() {
         return reviewContent;
     }
-
+    //set 추가
+    public void setReviewContent(String reviewContent) {
+        this.reviewContent = reviewContent;
+    }
     public String getReviewDate() {
         return reviewDate;
     }

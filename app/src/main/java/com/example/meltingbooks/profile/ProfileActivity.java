@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +30,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import androidx.activity.result.contract.ActivityResultContracts;
+
 public class ProfileActivity extends BaseActivity {
 
     private TextView profileName, profileLevel, profileBio;
@@ -41,10 +44,24 @@ public class ProfileActivity extends BaseActivity {
     private FeedAdapter feedAdapter;
     private List<FeedItem> feedList = new ArrayList<>();
 
+    //피드 갱신용
+    private ActivityResultLauncher<Intent> feedDetailLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        // ActivityResultLauncher 초기화
+        feedDetailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        // FeedDetailActivity에서 삭제/수정 후 돌아올 때 처리
+                        loadUserProfile(); // 프로필 화면의 피드 갱신
+                    }
+                }
+        );
 
         setupBottomNavigation();
 
@@ -76,7 +93,9 @@ public class ProfileActivity extends BaseActivity {
         // 🔥 리사이클러뷰 설정
         feedRecyclerView = findViewById(R.id.feedRecyclerView);
         feedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        feedAdapter = new FeedAdapter(this, feedList);
+
+        //피드 갱신용(수정)
+        feedAdapter = new FeedAdapter(this, feedList, feedDetailLauncher);
         feedRecyclerView.setAdapter(feedAdapter);
 
         // 프로필 불러오기

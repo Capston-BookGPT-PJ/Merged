@@ -42,6 +42,7 @@ public class FeedActivity extends BaseActivity {
         setupBottomNavigation();
 
 
+
         // 글 작성 화면으로 이동
         ImageButton goToUpload = findViewById(R.id.goToUpload);
         goToUpload.setOnClickListener(v -> {
@@ -68,24 +69,27 @@ public class FeedActivity extends BaseActivity {
             //리사이클러뷰 설정
             feedRecyclerView = findViewById(R.id.feedRecyclerView);
             feedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-            feedAdapter = new FeedAdapter(this, feedList);
+            // 피드 갱신용 수정
+            feedAdapter = new FeedAdapter(this, feedList, feedDetailLauncher);
             feedRecyclerView.setAdapter(feedAdapter);
+
 
             //서버에서 피드 불러오기
             loadFeeds();
         }
     }
-/*
-    // Activity가 이미 생성된 상태에서 새로운 Intent를 받을 때 호출됨
+
     // 피드 갱신
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent != null && intent.getBooleanExtra("refreshFeed", false)) {
-            loadFeeds(); // 피드 갱신
+            loadFeeds(); // 서버에서 전체 피드 다시 불러오기
         }
     }
-*/
+
+
+
 
     //서버에서 피드 목록 불러옴
     private void loadFeeds() {
@@ -162,5 +166,56 @@ public class FeedActivity extends BaseActivity {
     @Override
     protected int getCurrentNavItemId() {
         return R.id.Feed;
+    }
+
+
+    // 피드 갱신 런처
+    private final ActivityResultLauncher<Intent> feedDetailLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Intent data = result.getData();
+
+                            int deletedPostId = data.getIntExtra("deletedPostId", -1);
+                            if (deletedPostId != -1) removeFeedFromList(deletedPostId);
+
+                            FeedResponse updatedFeed = (FeedResponse) data.getSerializableExtra("updatedFeed");
+                            if (updatedFeed != null) updateFeedInList(updatedFeed);
+                        }
+                    }
+            );
+
+    // 피드 삭제 갱신
+    private void removeFeedFromList(int postId) {
+        for (int i = 0; i < feedList.size(); i++) {
+            if (feedList.get(i).getPostId() == postId) { // FeedResponse에 reviewId가 있다고 가정
+                feedList.remove(i);
+                feedAdapter.notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
+
+    //피드 수정 갱신
+    private void updateFeedInList(FeedResponse updatedFeed) {
+        for (int i = 0; i < feedList.size(); i++) {
+            FeedItem item = feedList.get(i);
+            if (item.getPostId() == updatedFeed.getReviewId()) { // postId와 reviewId 비교
+                // FeedItem 필드 업데이트
+                item.setReviewContent(updatedFeed.getContent());
+                
+                List<String> images = updatedFeed.getReviewImageUrls();
+                if (images != null && !images.isEmpty()) {
+                    item.setImageUrl(images.get(0)); // 첫 번째 이미지 사용
+                } else {
+                    item.setImageUrl(null); // 이미지 없으면 null
+                }
+                // 필요한 필드가 있으면 추가
+                feedAdapter.notifyItemChanged(i);
+                break;
+            }
+        }
     }
 }

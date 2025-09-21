@@ -382,7 +382,6 @@ public class FeedWriteActivity extends AppCompatActivity {
             ReviewRequest request = new ReviewRequest(1, content, 5, hashtags); // bookId=1, rating=5 예시
             ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
-            //Call<ApiResponse<ReviewResponse>> call = apiService.createReview("Bearer " + token, userId, request);
             //게시슬 수정 기능 추가
             Call<ApiResponse<ReviewResponse>> call; // 밖에서 선언
 
@@ -396,6 +395,7 @@ public class FeedWriteActivity extends AppCompatActivity {
                         userId, // 쿼리 파라미터
                         updateRequest
                 );
+
                 /*
                 // 수정 모드: 모든 필드 포함
                 String imageUrl = selectedImageUri != null ? selectedImageUri.toString() : null;
@@ -435,9 +435,34 @@ public class FeedWriteActivity extends AppCompatActivity {
                             uploadReviewImage(apiService, token, reviewId, selectedImageUri);
                         } else {
                             Toast.makeText(FeedWriteActivity.this, isEdit ? "게시글 수정 완료!" : "리뷰 작성 완료!", Toast.LENGTH_SHORT).show();
-                            finish();
+
+                            if (isEdit) {
+                                // 수정: 런처로 갱신
+                                FeedResponse updatedFeed = new FeedResponse();
+                                updatedFeed.setHashtags(review.getHashtags());
+                                updatedFeed.setBookId(review.getBookId());
+                                updatedFeed.setContent(review.getContent());
+                                updatedFeed.setReviewImageUrls(review.getReviewImageUrls());
+                                updatedFeed.setUserId(review.getUserId());
+                                updatedFeed.setReviewId(review.getReviewId());
+                                updatedFeed.setRating(review.getRating());
+                                updatedFeed.setCreatedAt(review.getCreatedAt());
+
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("updatedFeed", updatedFeed);
+                                setResult(RESULT_OK, resultIntent);
+                                finish();
+                            } else {
+                                // 생성: FeedActivity에 refresh 신호 보내기
+                                Intent intent = new Intent(FeedWriteActivity.this, FeedActivity.class);
+                                intent.putExtra("refreshFeed", true);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+                            }
                         }
                     } else {
+                        // 실패 처리
                         Toast.makeText(FeedWriteActivity.this, isEdit ? "게시글 수정 실패" : "리뷰 작성 실패", Toast.LENGTH_SHORT).show();
                     }
                 }

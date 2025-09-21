@@ -2,9 +2,10 @@ package com.example.meltingbooks.network.feed;
 
 import com.example.meltingbooks.network.book.Book;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class FeedResponse {
+public class FeedResponse  implements Serializable {
     private int reviewId;
     private int userId;
     private String tagId;
@@ -88,4 +89,53 @@ public class FeedResponse {
 
     public String getCommentCreatedAt() { return commentCreatedAt; }
     public void setCommentCreatedAt(String commentCreatedAt) { this.commentCreatedAt = commentCreatedAt; }
+
+
+
+    //피드 갱신용
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public void setReviewImageUrls(List<String> reviewImageUrls) {
+        this.reviewImageUrls = reviewImageUrls;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setReviewId(int reviewId) {
+        this.reviewId = reviewId;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
+    public void setBookId(Integer bookId) {
+        this.bookId = bookId;
+    }
+
+    public void setBookTitle(String bookTitle) {
+        this.bookTitle = bookTitle;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setUserProfileImage(String userProfileImage) {
+        this.userProfileImage = userProfileImage;
+    }
+
 }

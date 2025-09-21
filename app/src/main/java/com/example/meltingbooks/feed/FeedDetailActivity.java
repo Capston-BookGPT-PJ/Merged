@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -163,11 +165,12 @@ public class FeedDetailActivity extends AppCompatActivity {
     // --- 이벤트 리스너 설정 ---
     private void setupListeners() {
         // 게시글 수정 / 삭제 버튼 리스너 (자신이 작성한 게시글에만 보임)
+        // FeedDetailActivity에서 수정 버튼 클릭
         btnEditPost.setOnClickListener(v -> {
             Intent intent = new Intent(FeedDetailActivity.this, FeedWriteActivity.class);
             intent.putExtra("postId", postId);
             intent.putExtra("isEdit", true);
-            startActivityForResult(intent, 1001);
+            feedEditLauncher.launch(intent); // ActivityResultLauncher로 교체
         });
 
         btnDeletePost.setOnClickListener(v -> {
@@ -426,4 +429,20 @@ public class FeedDetailActivity extends AppCompatActivity {
         currentFeed.setLikeCount(correctedCount);
         likeCount.setText(String.valueOf(correctedCount));
     }
+
+    //피드 갱신
+    private final ActivityResultLauncher<Intent> feedEditLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    FeedResponse updatedFeed = (FeedResponse) result.getData().getSerializableExtra("updatedFeed");
+                    if (updatedFeed != null) {
+                        // FeedActivity로 전달
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("updatedFeed", updatedFeed);
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
+                    }
+                }
+            });
+
 }
