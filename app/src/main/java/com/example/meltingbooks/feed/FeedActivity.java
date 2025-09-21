@@ -10,6 +10,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +40,7 @@ public class FeedActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         setupBottomNavigation();
+
 
         // 글 작성 화면으로 이동
         ImageButton goToUpload = findViewById(R.id.goToUpload);
@@ -72,6 +75,17 @@ public class FeedActivity extends BaseActivity {
             loadFeeds();
         }
     }
+/*
+    // Activity가 이미 생성된 상태에서 새로운 Intent를 받을 때 호출됨
+    // 피드 갱신
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent != null && intent.getBooleanExtra("refreshFeed", false)) {
+            loadFeeds(); // 피드 갱신
+        }
+    }
+*/
 
     //서버에서 피드 목록 불러옴
     private void loadFeeds() {
@@ -115,7 +129,8 @@ public class FeedActivity extends BaseActivity {
                                 feed.getBookId(),
                                 feed.getCommentCount(),
                                 feed.getLikeCount(),
-                                feed.getTagId()
+                                feed.getTagId(),
+                                feed.getHashtags()
                         );
 
                         // ✅ 리뷰ID를 postId로 세팅

@@ -2,6 +2,8 @@ package com.example.meltingbooks.feed;
 
 import com.example.meltingbooks.network.book.Book;
 
+import java.util.List;
+
 public class FeedItem {
     private String userName;//유저 이름 닉네임!!
     private String tagId;
@@ -45,6 +47,8 @@ public class FeedItem {
     private int commentCount;     // 댓글 수
     private int likeCount;        // 좋아요 수
 
+    private List<String> hashtags;
+
 
     public FeedItem(String userName, String reviewContent, String reviewDate,
                     String imageUrl, String profileImageUrl, Integer bookId,
@@ -58,6 +62,22 @@ public class FeedItem {
         this.commentCount = commentCount;
         this.likeCount = likeCount;
         this.tagId = tagId;
+    }
+
+    //해시태그 추가 버전(별점은 표시 안함)
+    public FeedItem(String userName, String reviewContent, String reviewDate,
+                    String imageUrl, String profileImageUrl, Integer bookId,
+                    int commentCount, int likeCount, String tagId, List<String> hashtags) {
+        this.userName = userName;
+        this.reviewContent = reviewContent;
+        this.reviewDate = reviewDate;
+        this.imageUrl = imageUrl;
+        this.profileImageUrl = profileImageUrl;
+        this.bookId = bookId;
+        this.commentCount = commentCount;
+        this.likeCount = likeCount;
+        this.tagId = tagId;
+        this.hashtags = hashtags;
     }
 
     //기존 생성자 (댓글/좋아요 없는 버전)도 유지
@@ -135,4 +155,16 @@ public class FeedItem {
 
     public boolean isLiked() { return liked; }
     public void setLiked(boolean liked) { this.liked = liked; }
+
+
+    // ✅ 해시태그 게터/세터 추가
+    public List<String> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
+    }
+
+
 }

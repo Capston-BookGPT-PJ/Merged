@@ -67,39 +67,69 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="10">
+                android:orientation="vertical"
+                android:padding="8dp">
 
-
-                <!-- 프로필 이미지 -->
-                <ImageView
-                    android:id="@+id/profileImage"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:layout_marginEnd="8dp"
-                    android:src="@drawable/sample_profile"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/profile_image_background"
-                    android:clipToOutline="true" />
-
-
-                <!-- 키보드 입력란 (사용자가 텍스트 입력) -->
-                <EditText
-                    android:id="@+id/etInput"
-                    android:layout_width="0dp"
+                <!-- 프로필 + EditText -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="8"
-                    android:background="@android:color/transparent"
-                    android:textColor="@color/textColor"
-                    android:gravity="top"
-                    android:hint="독서 후 느낌을 공유해 보세요!"
-                    android:textColorHint="@color/hintColor"
-                    android:inputType="textMultiLine"
-                    android:maxLines="15"
-                    android:padding="8dp"
-                    android:textSize="16sp" />
+                    android:orientation="horizontal">
+
+                    <!-- 프로필 이미지 -->
+                    <ImageView
+                        android:id="@+id/profileImage"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/sample_profile"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/profile_image_background"
+                        android:clipToOutline="true" />
+
+                    <!-- 키보드 입력란 -->
+                    <EditText
+                        android:id="@+id/etInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:textColor="@color/textColor"
+                        android:gravity="top"
+                        android:hint="독서 후 느낌을 공유해 보세요!"
+                        android:textColorHint="@color/hintColor"
+                        android:inputType="textMultiLine"
+                        android:maxLines="15"
+                        android:padding="8dp"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- 책 정보 삽입 (EditText 아래로) -->
+                <include
+                    android:id="@+id/feedBookSearch"
+                    layout="@layout/book_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
+
+                <!-- 별점 5개 추가 -->
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="5"
+                    android:stepSize="1"
+                    android:rating="0"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center"
+                    android:theme="@style/Widget.AppCompat.RatingBar.Small"
+                    android:isIndicator="false"
+                    android:visibility="gone"/>
+
             </LinearLayout>
         </ScrollView>
+
 
 
         <!-- 버튼 및 이미지 영역 (EditText 아래로 이동) -->
@@ -156,9 +186,34 @@
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="20dp"
                 android:scaleType="centerCrop" />
-
-
         </LinearLayout>
+    </LinearLayout>
+
+
+    <!-- 해시태그 입력란: 버튼 영역 바로 위 고정 -->
+    <LinearLayout
+        android:id="@+id/hashtagLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/round_background_20"
+        android:padding="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/etHashtag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="#해시태그 입력"
+            android:background="@android:color/transparent"
+            android:textColor="@color/text_blue"
+            android:textColorHint="@color/hintColor"
+            android:inputType="text"
+            android:singleLine="true"/>
     </LinearLayout>
 
     <!-- 버튼 영역 (항상 화면 하단에 고정) -->
@@ -168,6 +223,7 @@
         android:orientation="vertical"
         android:id="@+id/bottomLayout"
         android:layout_gravity="bottom">
+
 
         <!-- 가로선 -->
         <View
@@ -183,7 +239,7 @@
             android:paddingStart="8dp"
             android:paddingEnd="20dp">
 
-            <!-- 좌측 버튼 (첨부 파일, 좋아요, 해시태그) -->
+            <!-- 좌측 버튼 (첨부 파일, 해시태그) -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -201,11 +257,13 @@
                     android:padding="1dp"
                     android:src="@drawable/write_attach" />
 
+                <!-- 좋아요 기능 제외시킴
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:background="@android:color/darker_gray"
                     android:layout_marginEnd="8dp"/>
+
 
                 <ImageButton
                     android:id="@+id/btnLike"
@@ -217,6 +275,7 @@
                     android:scaleType="centerInside"
                     android:padding="1dp"
                     android:src="@drawable/write_like" />
+                    -->
 
                 <View
                     android:layout_width="1dp"
@@ -233,6 +292,22 @@
                     android:scaleType="centerInside"
                     android:padding="1dp"
                     android:src="@drawable/write_hashtag" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/darker_gray"
+                    android:layout_marginEnd="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/btnBook"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="책 추가"
+                    android:scaleType="centerInside"
+                    android:padding="1dp"
+                    android:src="@drawable/write_book" />
             </LinearLayout>
 
             <!-- 마이크 버튼 (맨 오른쪽) -->

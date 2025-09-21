@@ -6,11 +6,13 @@ public class ReviewResponse {
     private int reviewId;
     private String content;
     private List<String> reviewImageUrls;
-    private int rating;
+    private Integer rating;
     private int userId;
-    private int bookId;
+    private Integer bookId;
     private String createdAt;
     private String updatedAt;
+    //해시태그 추가
+    private List<String> hashtags;
 
     // Getter & Setter
     public int getReviewId() {
@@ -37,11 +39,11 @@ public class ReviewResponse {
         this.reviewImageUrls = reviewImageUrls;
     }
 
-    public int getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 
@@ -53,11 +55,11 @@ public class ReviewResponse {
         this.userId = userId;
     }
 
-    public int getBookId() {
+    public Integer getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(Integer bookId) {
         this.bookId = bookId;
     }
 
@@ -76,4 +78,6 @@ public class ReviewResponse {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
+    //해시태그 추가
+    public List<String> getHashtags() { return hashtags; }
 }

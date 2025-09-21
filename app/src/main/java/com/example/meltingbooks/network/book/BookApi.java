@@ -14,7 +14,7 @@ public interface BookApi {
     @GET("/api/books/search")
     Call<List<Book>> searchBooks(@Query("keyword") String keyword);
 
-    //book id로 책 정보 조회
+    //bookId로 책 정보 조회
     @GET("/api/books/{bookId}")
     Call<Book> getBookDetail(@Header("Authorization") String token,
                              @Path("bookId") int bookId);

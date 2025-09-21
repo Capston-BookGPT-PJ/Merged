@@ -4,8 +4,10 @@ package com.example.meltingbooks.network;
 import com.example.meltingbooks.network.feed.CommentRequest;
 import com.example.meltingbooks.network.feed.CommentResponse;
 import com.example.meltingbooks.network.feed.FeedPageResponse;
+import com.example.meltingbooks.network.feed.FeedResponse;
 import com.example.meltingbooks.network.feed.ReviewRequest;
 import com.example.meltingbooks.network.feed.ReviewResponse;
+import com.example.meltingbooks.network.feed.ReviewUpdateRequest;
 import com.example.meltingbooks.network.feed.UserReviewResponse;
 import com.example.meltingbooks.network.profile.UpdateUserRequest;
 import com.example.meltingbooks.network.profile.UserResponse;
@@ -135,4 +137,31 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("reviewId") int reviewId
     );
+
+    // ✅ 특정 리뷰 상세 정보 가져오기 (수정됨)
+    @GET("/api/reviews/{reviewId}")
+    Call<ApiResponse<FeedResponse>> getReviewDetail(
+            @Header("Authorization") String token,
+            @Path("reviewId") int reviewId,
+            @Query("userId") int userId // ✅ userId를 쿼리 파라미터로 추가
+    );
+
+
+    @PUT("/api/reviews/{postId}")
+    Call<ApiResponse<ReviewResponse>> updateReview(
+            @Header("Authorization") String token,
+            @Path("postId") int postId,
+            @Query("userId") int userId,   // 쿼리 파라미터
+            @Body ReviewUpdateRequest updateRequest
+    );
+
+
+    // 리뷰 삭제
+    @DELETE("/api/reviews/{reviewId}")
+    Call<Void> deleteReview(
+            @Header("Authorization") String token,
+            @Path("reviewId") int reviewId,
+            @Query("userId") int userId
+    );
+
 }

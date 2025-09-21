@@ -78,6 +78,9 @@
         <activity android:name=".feed.FeedWriteActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
         <activity android:name=".browse.BrowseActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
 
+        <!--피드 액티비티-->
+        <activity android:name=".feed.FeedDetailActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
+
         <!-- 캘린더 액티비티 -->
         <activity android:name=".calendar.CalendarActivity" android:windowSoftInputMode="adjustPan"/>
 

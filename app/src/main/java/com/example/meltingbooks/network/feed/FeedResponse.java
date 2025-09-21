@@ -1,5 +1,7 @@
 package com.example.meltingbooks.network.feed;
 
+import com.example.meltingbooks.network.book.Book;
+
 import java.util.List;
 
 public class FeedResponse {
@@ -9,15 +11,27 @@ public class FeedResponse {
     private String username;
     private String userProfileImage;
     private String content;
-    private int rating;
+    private Integer rating;
     private List<String> reviewImageUrls;
     private String createdAt;
     private int likeCount;
     private int commentCount;
     private List<String> hashtags;
-    private int bookId;
+    private Integer bookId;
     private String bookTitle;
     private String nickname;
+
+
+
+    // 추가 필드
+    private boolean liked;
+    private Book book; // FeedDetailActivity에서 캐싱용
+
+
+    // --- 댓글 관련 필드 추가 ---
+    private int commentId;          // 댓글 고유 ID
+    private String commentContent;  // 댓글 내용
+    private String commentCreatedAt; // 댓글 작성 시간
 
 
     // Getter
@@ -27,7 +41,7 @@ public class FeedResponse {
     public String getUsername() { return username; }
     public String getUserProfileImage() { return userProfileImage; }
     public String getContent() { return content; }
-    public int getRating() { return rating; }
+    public Integer getRating() { return rating; }
     public List<String> getReviewImageUrls() { return reviewImageUrls; }
     public String getCreatedAt() { return createdAt; }
     public String getFormattedCreatedAt() {
@@ -42,10 +56,36 @@ public class FeedResponse {
     public int getLikeCount() { return likeCount; }
     public int getCommentCount() { return commentCount; }
     public List<String> getHashtags() { return hashtags; }
-    public int getBookId() { return bookId; }
+    //해시태그 setter추가
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
+    }
+    public Integer getBookId() { return bookId; }
     public String getBookTitle() { return bookTitle; }
 
     public String getNickname() { return nickname; }
 
+    // --- liked Getter/Setter ---
+    public boolean isLiked() { return liked; }
+    public void setLiked(boolean liked) { this.liked = liked; }
 
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+    // --- Book Getter/Setter ---
+    public Book getBook() { return book; }
+    public void setBook(Book book) { this.book = book; }
+
+    // --- 댓글 Getter/Setter ---
+    public int getCommentId() { return commentId; }
+    public void setCommentId(int commentId) { this.commentId = commentId; }
+
+    public String getCommentContent() { return commentContent; }
+    public void setCommentContent(String commentContent) { this.commentContent = commentContent; }
+
+    public String getCommentCreatedAt() { return commentCreatedAt; }
+    public void setCommentCreatedAt(String commentCreatedAt) { this.commentCreatedAt = commentCreatedAt; }
 }

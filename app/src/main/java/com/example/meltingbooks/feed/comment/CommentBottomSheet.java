@@ -41,7 +41,7 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
 
     //feed와 group 구분 코드
 
-    private String postId;
+    private int postId;
     private String postType;
     public interface OnCommentAddedListener {
         void onCommentAdded(int commentCount);
@@ -86,7 +86,7 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            postId = getArguments().getString("postId");
+            postId = getArguments().getInt("postId");
             postType = getArguments().getString("postType");
         }
     }
@@ -127,6 +127,20 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
         EditText commentEditText = view.findViewById(R.id.commentEditText);
         ImageView postCommentButton = view.findViewById(R.id.postCommentButton);
 
+        /**postCommentButton.setOnClickListener(v -> {
+         String comment = commentEditText.getText().toString().trim();
+         if (!comment.isEmpty()) {
+         // 새 댓글을 리스트에 추가
+         commentList.add(new CommentItem("CurrentUser", comment, R.drawable.sample_profile));
+         commentAdapter.notifyDataSetChanged();
+         commentEditText.setText("");
+
+         // 콜백 호출하여 댓글 수 업데이트 나중에 서버와 통신하도록 수정
+         if (onCommentAddedListener != null) {
+         onCommentAddedListener.onCommentAdded(commentList.size());
+         }
+         }
+         });**/
 
         postCommentButton.setOnClickListener(v -> {
             String commentText = commentEditText.getText().toString().trim();
@@ -140,7 +154,7 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
 
                 CommentRequest request = new CommentRequest(commentText);
 
-                apiService.postComment("Bearer " + token, userId, Integer.parseInt(postId), request)
+                apiService.postComment("Bearer " + token, userId, postId, request)
                         .enqueue(new Callback<ApiResponse<CommentResponse>>() {
                             @Override
                             public void onResponse(Call<ApiResponse<CommentResponse>> call, Response<ApiResponse<CommentResponse>> response) {
@@ -185,7 +199,7 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
         ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
 
-        apiService.getComments("Bearer " + token, Integer.parseInt(postId))
+        apiService.getComments("Bearer " + token, postId)
                 .enqueue(new Callback<ApiResponse<List<CommentResponse>>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<List<CommentResponse>>> call,
@@ -211,7 +225,5 @@ public class CommentBottomSheet extends BottomSheetDialogFragment {
                     }
                 });
     }
-
-
 
 }

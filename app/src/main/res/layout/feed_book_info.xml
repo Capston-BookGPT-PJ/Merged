@@ -17,7 +17,7 @@
         android:padding="1dp">
 
         <ImageView
-            android:id="@+id/bookThumbnail"
+            android:id="@+id/bookCover"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginEnd="12dp"

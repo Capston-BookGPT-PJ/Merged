@@ -119,7 +119,7 @@ public class GroupWriteActivity extends AppCompatActivity {
     private BookController bookController;
     private RecyclerView rvSearchResults; //책 검색
     private LinearLayout bookInfoSelected; //선택한 책 표시
-    private ImageView bookThumbnail; //책 이미지
+    private ImageView bookCover; //책 이미지
     private TextView bookInfoTitle, bookInfoAuthor, bookInfoPublisher, bookInfoCategory; //제목 저자 출판사 카테고리
 
 
@@ -188,7 +188,7 @@ public class GroupWriteActivity extends AppCompatActivity {
         bookInfoTitle = bookInfoSelected.findViewById(R.id.bookInfoTitle);
         bookInfoAuthor = bookInfoSelected.findViewById(R.id.bookInfoAuthor);
         bookInfoPublisher = bookInfoSelected.findViewById(R.id.bookInfoPublisher);
-        bookThumbnail = bookInfoSelected.findViewById(R.id.bookThumbnail);
+        bookCover = bookInfoSelected.findViewById(R.id.bookCover);
         bookInfoCategory = bookInfoSelected.findViewById(R.id.bookInfoCategory);
 
         // RecyclerView 초기화
@@ -334,7 +334,7 @@ public class GroupWriteActivity extends AppCompatActivity {
                             bookInfoAuthor.setText(book.getAuthor());
                             bookInfoPublisher.setText(book.getPublisher());
                             bookInfoCategory.setText(book.getCategoryName());
-                            Glide.with(GroupWriteActivity.this).load(book.getCover()).into(bookThumbnail);
+                            Glide.with(GroupWriteActivity.this).load(book.getCover()).into(bookCover);
 
                             // 검색 결과만 숨기고
                             rvSearchResults.setVisibility(View.GONE);
@@ -413,7 +413,7 @@ public class GroupWriteActivity extends AppCompatActivity {
                             bookInfoAuthor.setText(book.getAuthor());
                             bookInfoPublisher.setText(book.getPublisher());
                             bookInfoCategory.setText(book.getCategoryName());
-                            Glide.with(GroupWriteActivity.this).load(book.getCover()).into(bookThumbnail);
+                            Glide.with(GroupWriteActivity.this).load(book.getCover()).into(bookCover);
 
                             // 검색 결과만 숨기고
                             rvSearchResults.setVisibility(View.GONE);

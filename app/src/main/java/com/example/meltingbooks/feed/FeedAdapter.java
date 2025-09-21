@@ -85,7 +85,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         );
         holder.likeCount.setText(String.valueOf(item.getLikeCount()));
 
-
         //좋아요 버튼
         // 좋아요 버튼 클릭 이벤트
         /**holder.likeButton.setOnClickListener(v -> {
@@ -147,6 +146,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             holder.profileImage.setImageResource(R.drawable.sample_profile); // 기본 이미지 적용
         }
 
+        //평점은 피드에서 표시 안함.
         //Book book = item.getBook();
         Integer bookId = item.getBookId();
         if  (bookId != null && bookId > 0){
@@ -197,6 +197,29 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         });*/
 
 
+        // ✅ 해시태그 표시
+        List<String> hashtags = item.getHashtags();
+        if (hashtags != null && !hashtags.isEmpty()) {
+            holder.hashtagContent.setVisibility(View.VISIBLE);
+            StringBuilder sb = new StringBuilder();
+            for (String tag : hashtags) {
+                sb.append("#").append(tag).append(" ");
+            }
+            holder.hashtagContent.setText(sb.toString().trim());
+        } else {
+            holder.hashtagContent.setVisibility(View.GONE);
+        }
+
+
+        //더보기
+        holder.readMore.setOnClickListener(v -> {
+            Context context = v.getContext();
+            Intent intent = new Intent(context, FeedDetailActivity.class);
+
+            // Adapter의 필드를 안전하게 사용
+            intent.putExtra("postId", item.getPostId());
+            context.startActivity(intent);
+        });
     }
 
 
@@ -217,6 +240,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView bookTitle, bookAuthor, bookPublisher, bookCategory;
         ImageView bookCover;
 
+        //해시태그
+        TextView hashtag, hashtagContent;
+        //더보기
+        TextView readMore;
+
 
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -231,13 +259,19 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             feedImage = itemView.findViewById(R.id.feedImage); // 피드에 이미지가 있을경우 사용.
             profileImage = itemView.findViewById(R.id.profileImage);
 
+            //해시태그 추가
+            hashtagContent=itemView.findViewById(R.id.hashtagContent);//해시태그 표시
+
+            //더보기
+            readMore = itemView.findViewById(R.id.readMore);//더보기
+
 
             // 책 정보 뷰 초기화
             bookInfoLayout = itemView.findViewById(R.id.bookInfoLayout);
             bookTitle = bookInfoLayout.findViewById(R.id.bookInfoTitle);
             bookAuthor = bookInfoLayout.findViewById(R.id.bookInfoAuthor);
             bookPublisher = bookInfoLayout.findViewById(R.id.bookInfoPublisher);
-            bookCover = bookInfoLayout.findViewById(R.id.bookThumbnail);
+            bookCover = bookInfoLayout.findViewById(R.id.bookCover);
             bookCategory = bookInfoLayout.findViewById(R.id.bookInfoCategory);
 
 
@@ -247,7 +281,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         }
     }
     private void toggleLike(FeedItem item, FeedViewHolder holder) {
-// SharedPreferences에서 토큰 가져오기
+        // SharedPreferences에서 토큰 가져오기
         SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
         String token = prefs.getString("jwt", null);
         if (token == null) return;
@@ -257,7 +291,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         boolean newState = !item.isLiked(); // 토글
         item.setLiked(newState);
 
-// UI 즉시 반영 (optimistic update)
+        // UI 즉시 반영 (optimistic update)
         holder.likeButton.setImageResource(
                 newState ? R.drawable.feed_like_full : R.drawable.feed_like_button
         );
@@ -265,7 +299,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         item.setLikeCount(newCount);
         holder.likeCount.setText(String.valueOf(newCount));
 
-// 서버 요청
+        // 서버 요청
         int reviewId = item.getPostId();
 
         Call<ApiResponse<Void>> call = newState

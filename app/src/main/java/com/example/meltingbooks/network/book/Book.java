@@ -1,6 +1,7 @@
 package com.example.meltingbooks.network.book;
 
 public class Book {
+    //private int bookId;
     private String title;
     private String cover;
     private String author;
@@ -32,6 +33,15 @@ public class Book {
         this.author = ""; // 기본값
     }
 
+    /*
+    // bookId의 Getter/Setter 추가
+    public int getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(int bookId) {
+        this.bookId = bookId;
+    }*/
 
     // ✅ Getter / Setter (Retrofit이 매핑할 때 필요)
     public String getTitle() { return title; }

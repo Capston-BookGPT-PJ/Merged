@@ -14,6 +14,7 @@ import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,6 +22,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,16 +32,25 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.meltingbooks.BuildConfig;
 import com.example.meltingbooks.R;
 import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
 import com.example.meltingbooks.network.ApiService;
+import com.example.meltingbooks.network.book.Book;
+import com.example.meltingbooks.network.book.BookController;
+import com.example.meltingbooks.network.feed.FeedResponse;
 import com.example.meltingbooks.network.feed.ReviewRequest;
 import com.example.meltingbooks.network.feed.ReviewResponse;
+import com.example.meltingbooks.network.feed.ReviewUpdateRequest;
+import com.example.meltingbooks.search.SearchBookAdapter;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,10 +85,9 @@ public class FeedWriteActivity extends AppCompatActivity {
     private String apiKey;  // apiKey는 이제 onCreate()에서 초기화
     private Request request;  // request는 callAPI() 메서드 내에서 생성
     private static final int REQUEST_PERMISSION_CODE = 1001;
-    private ImageButton btnRecord, btnAddFile, btnLike, btnHashtag, btnUpload;
+    private ImageButton btnRecord, btnAddFile, btnUpload;
     private EditText etInput;
     private Button btnSummarize;
-    private LinearLayout middleLayout, bottomLayout;
     private boolean isKeyboardVisible = false;
     private ImageView imageView;
     private StorageReference storageReference;
@@ -94,6 +105,38 @@ public class FeedWriteActivity extends AppCompatActivity {
     private OkHttpClient client;
     private Uri selectedImageUri;
 
+    // 해시태그 관련 변수
+    private EditText etHashtag;
+    private ImageButton btnHashtag;
+    private LinearLayout hashtagLayout;
+
+    // 책 관련 변수
+    private ImageButton btnBook;
+    private View feedBookSearch; //책 검색 및 선택 레이아웃(숨김.보임)
+    private RatingBar ratingBar;
+    //책 검색
+    private LinearLayout bookSearchInfoContainer;
+    private EditText etBookTitle;
+    private ImageView searchBook;
+    // 🔹 책 관련 변수 매핑
+    private SearchBookAdapter bookAdapter;
+    private List<Book> filteredBookList;
+    private BookController bookController;
+    private RecyclerView rvSearchResults; //책 검색
+    private LinearLayout bookInfoSelected; //선택한 책 표시
+    private ImageView bookCover; //책 이미지
+    private TextView bookInfoTitle, bookInfoAuthor, bookInfoPublisher, bookInfoCategory; //제목 저자 출판사 카테고리
+
+   // 선택한 책 bookId와 별점(전달용)
+    private int selectedBookId = -1;
+    private int selectedBookRating = 0;
+    private boolean isBookSearchInitialized = false;
+
+    //게시글 수정용 변수
+    private boolean isEdit = false;
+    private int postId = -1;
+    private ReviewResponse currentFeed; // 수정할 게시글 데이터
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +152,7 @@ public class FeedWriteActivity extends AppCompatActivity {
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);  // 아이콘 색상 어둡게!
         }
 
-
-
+        // ChatGPT API 키 초기화
         apiKey = BuildConfig.OPENAI_API_KEY;
 
         ///안드로이드 6.0버전 이상인지 체크해서 퍼미션
@@ -119,21 +161,44 @@ public class FeedWriteActivity extends AppCompatActivity {
                     Manifest.permission.RECORD_AUDIO},PERMISSION);
         }
 
+        //게시글 수정 모드
+        Intent feedIntent = getIntent();
+        isEdit = feedIntent.getBooleanExtra("isEdit", false);
+        postId = feedIntent.getIntExtra("postId", -1);
+
+        if (isEdit && postId != -1) {
+            loadReviewData(postId); // 서버에서 기존 리뷰 데이터 가져오기
+        }
+
+
+        // Firebase Storage 초기화
         storageReference = FirebaseStorage.getInstance().getReference("audio");
 
+        // UI 컴포넌트 초기화
         btnUpload = findViewById(R.id.btnUpload);
-        btnAddFile = findViewById(R.id.btnAddFile);
-        btnLike = findViewById(R.id.btnLike);
-        btnHashtag = findViewById(R.id.btnHashtag);
-        imageView = findViewById(R.id.imageView);
-        etInput = findViewById(R.id.etInput);
-        middleLayout = findViewById(R.id.middleLayout);
-        bottomLayout = findViewById(R.id.bottomLayout);
-        btnRecord = findViewById(R.id.btnRecord);
-        btnSummarize = findViewById(R.id.btnSummarize);
 
-        micImageView = findViewById(R.id.micON);
-        summarizingImageView = findViewById(R.id.summarizing);
+        // 하단 버튼(4가지)
+        btnRecord = findViewById(R.id.btnRecord); // 음성 녹음 버튼
+        btnAddFile = findViewById(R.id.btnAddFile); // 이미지 첨부 버튼
+        btnHashtag = findViewById(R.id.btnHashtag); // 해시태그 입력 버튼
+        btnBook = findViewById(R.id.btnBook); // 책 검색 버튼
+
+        // content
+        imageView = findViewById(R.id.imageView); // 청부된 이미지
+        etInput = findViewById(R.id.etInput); // 내용
+
+        // 추가 표시 버튼 및 이미지
+        btnSummarize = findViewById(R.id.btnSummarize); // 요약하기 버튼
+        micImageView = findViewById(R.id.micON); // 음성 녹음 중 이미지
+        summarizingImageView = findViewById(R.id.summarizing); // 요약 중 이미지
+
+        // 책 관련
+        ratingBar = findViewById(R.id.ratingBar); // 별점바 초기화
+        feedBookSearch = findViewById(R.id.feedBookSearch); // 책 정보 레이아웃 초기화
+
+        // 해시태그 관련
+        etHashtag = findViewById(R.id.etHashtag);
+        hashtagLayout = findViewById(R.id.hashtagLayout);
 
         // Initialize OkHttpClient for ChatGPT API
         client = new OkHttpClient();
@@ -173,14 +238,6 @@ public class FeedWriteActivity extends AppCompatActivity {
         });
 
         checkPermissions();
-
-        btnLike.setOnClickListener(v -> {
-            // 좋아요 기능 구현
-        });
-
-        btnHashtag.setOnClickListener(v -> {
-            // 해시태그 기능 구현
-        });
 
         // EditText에 입력 감지하는 TextWatcher 추가
         etInput.addTextChangedListener(new TextWatcher() {
@@ -240,6 +297,57 @@ public class FeedWriteActivity extends AppCompatActivity {
         });
         checkPermissions();
 
+
+        // 1. 책 버튼 클릭시 책 검색 및 별점 레이아웃 보이기
+        btnBook.setOnClickListener(v -> {
+            // 책 검색 레이아웃을 보이거나 숨기는 로직
+            if (feedBookSearch.getVisibility() == View.GONE) {
+                feedBookSearch.setVisibility(View.VISIBLE);
+                ratingBar.setVisibility(View.VISIBLE);
+                // 뷰 초기화 및 리스너 등록 메서드 호출
+                initializeBookSearchViews();
+            } else {
+                feedBookSearch.setVisibility(View.GONE);
+                ratingBar.setVisibility(View.GONE);
+            }
+        });
+
+
+        // 2. 해시태그 버튼 클릭 시 레이아웃 보이기
+        btnHashtag.setOnClickListener(v -> {
+            hashtagLayout.setVisibility(View.VISIBLE);
+            etHashtag.requestFocus();
+
+            // 키보드 자동 오픈
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(etHashtag, InputMethodManager.SHOW_IMPLICIT);
+
+            // ✅ 기존 텍스트 유지 + 뒤에 공백과 '#' 추가
+            String currentText = etHashtag.getText().toString();
+            if (!currentText.endsWith(" ") && !currentText.isEmpty()) {
+                currentText += " ";
+            }
+            etHashtag.setText(currentText + "#");
+            etHashtag.setSelection(etHashtag.getText().length()); // 커서 맨 뒤로
+        });
+
+        // 해시태그 '#' 추가
+        etHashtag.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                String currentText = etHashtag.getText().toString();
+                // 이미 끝에 공백 없으면 공백 추가
+                if (!currentText.endsWith(" ")) {
+                    currentText += " ";
+                }
+                // 새 # 추가
+                etHashtag.setText(currentText + "#");
+                // 커서를 마지막으로 이동
+                etHashtag.setSelection(etHashtag.getText().length());
+                return true; // 이벤트 소비
+            }
+            return false;
+        });
+
         btnUpload.setOnClickListener(v -> {
             SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
             String token = prefs.getString("jwt", null);
@@ -256,10 +364,66 @@ public class FeedWriteActivity extends AppCompatActivity {
                 return;
             }
 
-            ReviewRequest request = new ReviewRequest(1, content, 5); // bookId=1, rating=5 예시
+            // 해시태그 배열에 값 넣기
+            List<String> hashtags = new ArrayList<>();
+            String hashtagInput = etHashtag.getText().toString().trim();
+            if (!hashtagInput.isEmpty()) {
+                String[] parts = hashtagInput.split("#"); //# 기준 구분
+                for (String part : parts) {
+                    part = part.trim();
+                    if (!part.isEmpty()) {
+                        hashtags.add("#" + part); // 다시 # 붙이기
+                    }
+                }
+
+            }
+
+            /* ReviewRequest에 해시태그 추가 및 서버에서 bookId, rating 값 받기!!!!!!!!!*/
+            ReviewRequest request = new ReviewRequest(1, content, 5, hashtags); // bookId=1, rating=5 예시
             ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
-            Call<ApiResponse<ReviewResponse>> call = apiService.createReview("Bearer " + token, userId, request);
+            //Call<ApiResponse<ReviewResponse>> call = apiService.createReview("Bearer " + token, userId, request);
+            //게시슬 수정 기능 추가
+            Call<ApiResponse<ReviewResponse>> call; // 밖에서 선언
+
+            if (isEdit) {
+                String imageUrl = selectedImageUri != null ? selectedImageUri.toString() : null;
+                ReviewUpdateRequest updateRequest = new ReviewUpdateRequest(content, imageUrl);
+
+                call = apiService.updateReview(
+                        "Bearer " + token,
+                        postId,
+                        userId, // 쿼리 파라미터
+                        updateRequest
+                );
+                /*
+                // 수정 모드: 모든 필드 포함
+                String imageUrl = selectedImageUri != null ? selectedImageUri.toString() : null;
+                ReviewUpdateRequest updateRequest = new ReviewUpdateRequest(
+                        content,
+                        imageUrl,
+                        selectedBookId != -1 ? selectedBookId : null,  // 선택한 책 ID
+                        selectedBookRating != 0 ? selectedBookRating : null,  // 별점
+                        hashtags.isEmpty() ? null : hashtags
+                );
+
+                call = apiService.updateReview(
+                        "Bearer " + token,
+                        postId,
+                        userId,  // 쿼리 파라미터
+                        updateRequest
+                );
+                */
+
+            } else {
+                ReviewRequest createRequest = new ReviewRequest(1, content, 5, hashtags);
+                call = apiService.createReview(
+                        "Bearer " + token,
+                        userId,
+                        createRequest
+                );
+            }
+
             call.enqueue(new Callback<ApiResponse<ReviewResponse>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<ReviewResponse>> call, Response<ApiResponse<ReviewResponse>> response) {
@@ -270,11 +434,11 @@ public class FeedWriteActivity extends AppCompatActivity {
                         if (selectedImageUri != null) {
                             uploadReviewImage(apiService, token, reviewId, selectedImageUri);
                         } else {
-                            Toast.makeText(FeedWriteActivity.this, "리뷰 작성 완료!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(FeedWriteActivity.this, isEdit ? "게시글 수정 완료!" : "리뷰 작성 완료!", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     } else {
-                        Toast.makeText(FeedWriteActivity.this, "리뷰 작성 실패", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FeedWriteActivity.this, isEdit ? "게시글 수정 실패" : "리뷰 작성 실패", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -543,4 +707,126 @@ public class FeedWriteActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    //책 검색과 선택 및 별점
+    private void initializeBookSearchViews() {
+        // 1. 최상위 뷰인 feedBookSearch를 찾습니다.
+        feedBookSearch = findViewById(R.id.feedBookSearch);
+
+        // 2. feedBookSearch가 null이 아닌지 확인합니다.
+        if (feedBookSearch != null) {
+            // 3. 이제 안전하게 하위 뷰들을 찾습니다.
+            bookSearchInfoContainer = feedBookSearch.findViewById(R.id.bookSearchInfoContainer);
+            etBookTitle = feedBookSearch.findViewById(R.id.etBookTitle);
+            searchBook = feedBookSearch.findViewById(R.id.searchBook);
+            rvSearchResults = feedBookSearch.findViewById(R.id.rvSearchResults);
+            bookInfoSelected = feedBookSearch.findViewById(R.id.bookInfoSelected);
+
+            // bookInfoSelected도 null 체크를 하는 것이 안전합니다.
+            if (bookInfoSelected != null) {
+                bookInfoTitle = bookInfoSelected.findViewById(R.id.bookInfoTitle);
+                bookInfoAuthor = bookInfoSelected.findViewById(R.id.bookInfoAuthor);
+                bookInfoPublisher = bookInfoSelected.findViewById(R.id.bookInfoPublisher);
+                bookCover = bookInfoSelected.findViewById(R.id.bookCover);
+                bookInfoCategory = bookInfoSelected.findViewById(R.id.bookInfoCategory);
+            }
+
+            // RecyclerView 및 어댑터 초기화 로직
+            bookController = new BookController(this);
+            filteredBookList = new ArrayList<>();
+            bookAdapter = new SearchBookAdapter(this, filteredBookList);
+            rvSearchResults.setLayoutManager(new LinearLayoutManager(this));
+            rvSearchResults.setAdapter(bookAdapter);
+
+
+            // 책 검색 버튼 클릭 리스너
+            searchBook.setOnClickListener(v -> {
+                if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.GONE);
+                String query = etBookTitle.getText().toString().trim();
+                rvSearchResults.setVisibility(View.VISIBLE);
+
+                if (!query.isEmpty()) {
+                    bookController.searchBooks(query, new Callback<List<Book>>() {
+                        @Override
+                        public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+                            filteredBookList.clear();
+                            if (response.isSuccessful() && response.body() != null) {
+                                filteredBookList.addAll(response.body());
+                            }
+                            bookAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Book>> call, Throwable t) {
+                            t.printStackTrace();
+                            Toast.makeText(FeedWriteActivity.this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+
+            // RecyclerView 아이템 클릭
+            bookAdapter.setOnItemClickListener(book -> {
+                //selectedBookId = book.getBookId(); //Book.java bookId 추가
+                bookInfoTitle.setText(book.getTitle());
+                bookInfoAuthor.setText(book.getAuthor());
+                bookInfoPublisher.setText(book.getPublisher());
+                bookInfoCategory.setText(book.getCategoryName());
+                Glide.with(this).load(book.getCover()).into(bookCover);
+
+                rvSearchResults.setVisibility(View.GONE);
+                bookInfoSelected.setVisibility(View.VISIBLE);
+            });
+            // 별점 선택 리스너
+            ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                if (fromUser) {
+                    selectedBookRating = (int) rating; // 소수점 버리고 정수 저장
+                }
+            });
+        }
+    }
+
+    //게시글 수정: 기존 게시글 불러오기
+    private void loadReviewData(int postId) {
+        SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
+        String token = prefs.getString("jwt", null);
+        int userId = prefs.getInt("userId", -1);
+
+        if (token == null || userId == -1) {
+            Log.e("Feed", "토큰 또는 사용자 ID가 없습니다.");
+            return;
+        }
+
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
+        apiService.getReviewDetail("Bearer " + token, postId, userId)
+                .enqueue(new Callback<ApiResponse<FeedResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<FeedResponse>> call, Response<ApiResponse<FeedResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            FeedResponse feed = response.body().getData();
+                            bindDataToViews(feed); // bindDataToViews도 FeedResponse 타입으로 변경
+                        } else {
+                            Toast.makeText(FeedWriteActivity.this, "게시글 로드 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<FeedResponse>> call, Throwable t) {
+                        Toast.makeText(FeedWriteActivity.this, "네트워크 오류", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void bindDataToViews(FeedResponse feed) {
+        etInput.setText(feed.getContent());
+        etInput.setSelection(etInput.getText().length());
+
+        if (feed.getHashtags() != null) {
+            etHashtag.setText(String.join(" ", feed.getHashtags()));
+        }
+
+        // 선택한 책 ID 등
+        selectedBookId = feed.getBookId();
+    }
+
 }

@@ -1,40 +1,25 @@
-package com.example.meltingbooks.network.feed;// 댓글 조회 응답용
+package com.example.meltingbooks.network.feed;
 
-// 조회 응답용
 public class CommentResponse {
-    private int id;
-    private String content;
+    private int commentId;
     private int userId;
-    private int reviewId;
+    private String nickname;
+    private String tagId;              // null 가능
+    private String userProfileImage;   // null 가능
+    private String content;
     private String createdAt;
+    private int likeCount;
+    private int replyCount;
 
-    // 기본 생성자
     public CommentResponse() {}
 
-    // 전체 필드 생성자
-    public CommentResponse(int id, String content, int userId, int reviewId, String createdAt) {
-        this.id = id;
-        this.content = content;
-        this.userId = userId;
-        this.reviewId = reviewId;
-        this.createdAt = createdAt;
-    }
-
     // Getter & Setter
-    public int getId() {
-        return id;
+    public int getCommentId() {
+        return commentId;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
     }
 
     public int getUserId() {
@@ -45,16 +30,60 @@ public class CommentResponse {
         this.userId = userId;
     }
 
-    public int getReviewId() {
-        return reviewId;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+
+    public String getUserProfileImage() {
+        return userProfileImage;
+    }
+
+    public void setUserProfileImage(String userProfileImage) {
+        this.userProfileImage = userProfileImage;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public int getReplyCount() {
+        return replyCount;
+    }
+
+    public void setReplyCount(int replyCount) {
+        this.replyCount = replyCount;
     }
 
     public String getFormattedCreatedAt() {
@@ -65,8 +94,5 @@ public class CommentResponse {
         } catch (Exception e) {
             return createdAt;
         }
-    }
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
     }
 }

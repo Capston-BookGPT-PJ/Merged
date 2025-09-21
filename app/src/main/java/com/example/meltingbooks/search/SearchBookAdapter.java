@@ -35,12 +35,12 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Bo
     }
 
     public static class BookViewHolder extends RecyclerView.ViewHolder {
-        ImageView bookThumbnail;
+        ImageView bookCover;
         TextView bookInfoTitle, bookInfoAuthor, bookInfoPublisher, bookInfoCategory;
 
         public BookViewHolder(View itemView) {
             super(itemView);
-            bookThumbnail = itemView.findViewById(R.id.bookThumbnail);
+            bookCover = itemView.findViewById(R.id.bookCover);
             bookInfoTitle = itemView.findViewById(R.id.bookInfoTitle);
             bookInfoAuthor = itemView.findViewById(R.id.bookInfoAuthor);
             bookInfoPublisher = itemView.findViewById(R.id.bookInfoPublisher);
@@ -67,7 +67,7 @@ public class SearchBookAdapter extends RecyclerView.Adapter<SearchBookAdapter.Bo
 
         Glide.with(context)
                 .load(book.getCover())
-                .into(holder.bookThumbnail);
+                .into(holder.bookCover);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onItemClick(book);
