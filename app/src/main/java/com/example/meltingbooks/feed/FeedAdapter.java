@@ -316,7 +316,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         String token = prefs.getString("jwt", null);
         if (token == null) return;
 
-        ApiService apiService = ApiClient.getClient(context, token).create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
         boolean newState = !item.isLiked(); // 토글
         item.setLiked(newState);

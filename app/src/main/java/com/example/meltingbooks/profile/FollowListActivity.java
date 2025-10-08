@@ -71,7 +71,7 @@ public class FollowListActivity extends AppCompatActivity {
             return;
         }
 
-        FollowApi api = ApiClient.getClient(this, token).create(FollowApi.class);
+        FollowApi api = ApiClient.getClient(token).create(FollowApi.class);
 
         Call<ApiResponse<List<FollowUser>>> call;
         if ("followers".equals(type)) {

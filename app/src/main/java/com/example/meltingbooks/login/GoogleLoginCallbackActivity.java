@@ -25,11 +25,10 @@ public class GoogleLoginCallbackActivity extends AppCompatActivity {
 
             // ✅ 백엔드가 token, userID 같은 값 붙여서 redirect 해준다고 가정
             String token = uri.getQueryParameter("token");
-            String refreshToken = uri.getQueryParameter("refreshToken"); // 👈 추가
             String userId = uri.getQueryParameter("userId");
 
-            if (token != null && refreshToken != null) {
-                saveTokenAndUser(token, refreshToken, userId);
+            if (token != null) {
+                saveTokenAndUser(token,userId);
                 Toast.makeText(this, "로그인 성공: " + userId + token, Toast.LENGTH_SHORT).show();
                 //Log.d("CALLBACK", "받은 토큰: " + token); //토큰 확인용
             } else {
@@ -42,12 +41,10 @@ public class GoogleLoginCallbackActivity extends AppCompatActivity {
         finish();
     }
 
-    //로그인 토큰 저장
-    private void saveTokenAndUser(String token,  String refreshToken, String userId) {
+    private void saveTokenAndUser(String token, String userId) {
         SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
         prefs.edit()
                 .putString("jwt", token)
-                .putString("refreshToken", refreshToken)
                 .putInt("userId", Integer.parseInt(userId))
                 .apply();
     }

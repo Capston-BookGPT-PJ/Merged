@@ -1,7 +1,5 @@
 package com.example.meltingbooks.network.browse;
 
-import android.content.Context;
-
 import com.example.meltingbooks.network.ApiClient;
 
 import java.util.List;
@@ -12,11 +10,9 @@ import retrofit2.Response;
 
 public class UserController {
     private UserApi userApi;
-    private Context context;
 
-    public UserController(Context context, String token) {
-        this.context = context;
-        userApi = ApiClient.getClient(context, token).create(UserApi.class);
+    public UserController(String token) {
+        userApi = ApiClient.getClient(token).create(UserApi.class);
     }
 
     public void searchUsers(String nickname, Callback<List<PopularUser>> callback) {

@@ -27,7 +27,7 @@ public class GroupController {
             return;
         }
 
-        groupApi = ApiClient.getClient(context, token).create(GroupApi.class);
+        groupApi = ApiClient.getClient(token).create(GroupApi.class);
     }
 
     //그룹 생성

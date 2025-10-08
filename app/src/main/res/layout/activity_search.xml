@@ -27,9 +27,6 @@
             android:padding="8dp"
             android:textSize="18sp"
             android:inputType="text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:clickable="true"
             android:imeOptions="actionSearch" />
 
         <ImageButton

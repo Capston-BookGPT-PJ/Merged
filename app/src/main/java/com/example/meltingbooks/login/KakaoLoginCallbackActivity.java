@@ -23,11 +23,10 @@ public class KakaoLoginCallbackActivity extends AppCompatActivity {
 
             // 백엔드가 redirect 시에 붙여주는 값 받기
             String token = uri.getQueryParameter("token");
-            String refreshToken = uri.getQueryParameter("refreshToken"); // 👈 추가
             String userId = uri.getQueryParameter("userId");
 
             if (token != null && userId != null) {
-                saveTokenAndUser(token, refreshToken, userId);
+                saveTokenAndUser(token, userId);
                 Toast.makeText(this, "카카오 로그인 성공: " + userId, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
@@ -39,11 +38,10 @@ public class KakaoLoginCallbackActivity extends AppCompatActivity {
         finish();
     }
 
-    private void saveTokenAndUser(String token,String refreshToken, String userId) {
+    private void saveTokenAndUser(String token, String userId) {
         SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
         prefs.edit()
                 .putString("jwt", token)
-                .putString("refreshToken", refreshToken)
                 .putInt("userId", Integer.parseInt(userId))
                 .apply();
     }

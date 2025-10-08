@@ -62,41 +62,41 @@
                     app:layout_constraintTop_toTopOf="parent"
                     >
 
-                    <TextView
-                        android:id="@+id/set_goal_monthly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="월간"
-                        android:textSize="14sp"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:gravity="center"
-                        android:textColor="@android:color/black"
-                        android:background="@drawable/setgoal_my_selector"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:stateListAnimator="@null"/>
+                <TextView
+                    android:id="@+id/set_goal_monthly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="월간"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:background="@drawable/setgoal_my_selector"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@null"/>
 
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="16dp"
-                        android:layout_marginHorizontal="4dp"
-                        android:background="#4D000000"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:background="#4D000000"/>
 
-                    <TextView
-                        android:id="@+id/set_goal_yearly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="연간"
-                        android:textSize="14sp"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:gravity="center"
-                        android:textColor="@android:color/black"
-                        android:background="@drawable/setgoal_my_selector"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:stateListAnimator="@null"/>
+                <TextView
+                    android:id="@+id/set_goal_yearly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="연간"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:background="@drawable/setgoal_my_selector"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:stateListAnimator="@null"/>
                 </LinearLayout>
 
                 <!-- 회색 구분선 -->

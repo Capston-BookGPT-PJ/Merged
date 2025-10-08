@@ -175,8 +175,8 @@ public class GroupFeedAdapter extends RecyclerView.Adapter<GroupFeedAdapter.Grou
         String token = prefs.getString("jwt", null);
         if (token == null) return;
 
-        ApiService apiService = ApiClient.getClient(context, token).create(ApiService.class);
-        GroupApi groupApi = ApiClient.getClient(context, token).create(GroupApi.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
+        GroupApi groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         // 서버 요청
         int groupId = item.getGroupId();   // ✅ 그룹 ID 가져오기

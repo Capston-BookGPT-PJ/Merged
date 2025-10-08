@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -14,7 +13,6 @@ import androidx.core.content.ContextCompat;
 
 import com.example.meltingbooks.R;
 import com.example.meltingbooks.feed.FeedActivity;
-import com.example.meltingbooks.network.TokenAutoRefresh;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -33,38 +31,38 @@ public class SplashActivity extends AppCompatActivity {
             View decor = getWindow().getDecorView();
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
-
-
+/*
+        // 일정 시간 뒤 자동 로그인 검사
         new Handler().postDelayed(() -> {
+            // token 받아오기
             SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
             String token = prefs.getString("jwt", null);
             int userId = prefs.getInt("userId", -1);
 
+
+            Intent intent;
+/*
             if (token != null && userId != -1) {
-                Log.d("SplashActivity", "토큰 존재: " + token + ", userId: " + userId);
-
-                TokenAutoRefresh tokenAutoRefresh = new TokenAutoRefresh(this);
-                tokenAutoRefresh.start(new TokenAutoRefresh.Callback() {
-                    @Override
-                    public void onSuccess(String newToken) {
-                        Log.d("SplashActivity", "토큰 갱신 완료: " + newToken);
-                        startActivity(new Intent(SplashActivity.this, FeedActivity.class));
-                        finish();
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.e("SplashActivity", "토큰 갱신 실패 → 로그인 화면으로 이동");
-                        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                        finish();
-                    }
-                });
+                // ✅ 자동 로그인 성공 → FeedActivity로 이동
+                intent = new Intent(SplashActivity.this, FeedActivity.class);
             } else {
-                Log.d("SplashActivity", "토큰 없음 → 로그인 화면으로 이동");
-                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-                finish();
+                // ❌ 토큰 없음 → LoginActivity로 이동
+                intent = new Intent(SplashActivity.this, LoginActivity.class);
+            }
+
+            startActivity(intent);
+            finish();
+
+        }, SPLASH_DELAY);*/
+
+        // 일정 시간 뒤 LoginActivity로 이동
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish(); // SplashActivity 종료
             }
         }, SPLASH_DELAY);
-
     }
 }

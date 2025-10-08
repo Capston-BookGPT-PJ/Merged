@@ -5,10 +5,10 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.view.View;
 
 import com.example.meltingbooks.R;
 import com.example.meltingbooks.calendar.utils.ProgressBarUtil;

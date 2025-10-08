@@ -2,34 +2,20 @@ package com.example.meltingbooks.calendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import androidx.fragment.app.Fragment;
-
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.LinearLayout;
 
-import com.bumptech.glide.Glide;
+import androidx.fragment.app.Fragment;
+
 import com.example.meltingbooks.R;
-import com.example.meltingbooks.calendar.utils.BookListHelper;
-import com.example.meltingbooks.calendar.utils.BookListHelper.BookItem;
 import com.example.meltingbooks.calendar.utils.ProgressBarUtil;
-import com.example.meltingbooks.network.log.LogApi;
-import com.example.meltingbooks.network.log.LogController;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-
-
 import com.example.meltingbooks.calendar.view.CircularProgressView;
 import com.example.meltingbooks.calendar.view.GoalProgressView;
 import com.example.meltingbooks.network.ApiClient;
@@ -37,6 +23,8 @@ import com.example.meltingbooks.network.ApiResponse;
 import com.example.meltingbooks.network.goal.GoalApi;
 import com.example.meltingbooks.network.goal.GoalController;
 import com.example.meltingbooks.network.goal.GoalResponse;
+import com.example.meltingbooks.network.log.LogApi;
+import com.example.meltingbooks.network.log.LogController;
 import com.example.meltingbooks.network.log.ReadingLogResponse;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -55,6 +43,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -93,10 +82,10 @@ public class DetailGoalFragment extends Fragment {
         token = prefs.getString("jwt", null);
         userId = prefs.getInt("userId", -1);
 
-        GoalApi apiService = ApiClient.getClient(requireContext(), token).create(GoalApi.class);
+        GoalApi apiService = ApiClient.getClient(token).create(GoalApi.class);
         goalController = new GoalController(apiService);
 
-        LogApi logApi = ApiClient.getClient(requireContext(), token).create(LogApi.class);
+        LogApi logApi = ApiClient.getClient(token).create(LogApi.class);
         logController = new LogController(logApi);
 
 
@@ -200,17 +189,17 @@ public class DetailGoalFragment extends Fragment {
             readingHours[index] = hours;
         }
 
-        /** for (int i = 6; i >= 0; i--) {
-         calendar.add(Calendar.DAY_OF_YEAR, -i);
-         String label = sdf.format(calendar.getTime()); // 요일
+           /** for (int i = 6; i >= 0; i--) {
+            calendar.add(Calendar.DAY_OF_YEAR, -i);
+            String label = sdf.format(calendar.getTime()); // 요일
 
-         int index = 6 - i;
-         barEntries.add(new BarEntry(index, readingHours[index]));
-         lineEntries.add(new Entry(index, readingHours[index]));
-         xLabels.add(label);
+            int index = 6 - i;
+            barEntries.add(new BarEntry(index, readingHours[index]));
+            lineEntries.add(new Entry(index, readingHours[index]));
+            xLabels.add(label);
 
-         calendar.add(Calendar.DAY_OF_YEAR, i); // 원래 날짜로 되돌림
-         }*/
+            calendar.add(Calendar.DAY_OF_YEAR, i); // 원래 날짜로 되돌림
+        }*/
 
 
         // 2. 막대그래프
@@ -309,9 +298,9 @@ public class DetailGoalFragment extends Fragment {
                 if (goals != null && !goals.isEmpty()) {
 
                     // 현재 날짜 구하기
-                    java.util.Calendar calendar = java.util.Calendar.getInstance();
-                    int currentYear = calendar.get(java.util.Calendar.YEAR);
-                    int currentMonth = calendar.get(java.util.Calendar.MONTH) + 1; // 0부터 시작하므로 +1
+                    Calendar calendar = Calendar.getInstance();
+                    int currentYear = calendar.get(Calendar.YEAR);
+                    int currentMonth = calendar.get(Calendar.MONTH) + 1; // 0부터 시작하므로 +1
 
                     GoalResponse selectedGoal = null;
 
@@ -419,21 +408,21 @@ public class DetailGoalFragment extends Fragment {
 
         // 책 이미지 (추후 구조 확장 대응)
         /**LinearLayout bookListContainer = getView().findViewById(R.id.book_list_container);
-         bookListContainer.removeAllViews();
-         if (goal.getBooks() != null) {
-         for (GoalResponse.Book book : goal.getBooks()) {
-         ImageView imageView = new ImageView(requireContext());
-         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 220);
-         params.setMargins(8, 0, 8, 0);
-         imageView.setLayoutParams(params);
+        bookListContainer.removeAllViews();
+        if (goal.getBooks() != null) {
+            for (GoalResponse.Book book : goal.getBooks()) {
+                ImageView imageView = new ImageView(requireContext());
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(150, 220);
+                params.setMargins(8, 0, 8, 0);
+                imageView.setLayoutParams(params);
 
-         Glide.with(this)
-         .load(book.getCoverUrl())
-         .into(imageView);
+                Glide.with(this)
+                        .load(book.getCoverUrl())
+                        .into(imageView);
 
-         bookListContainer.addView(imageView);
-         }
-         }*/
+                bookListContainer.addView(imageView);
+            }
+        }*/
     }
 
 

@@ -16,11 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -33,15 +28,16 @@ import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
 import com.example.meltingbooks.network.book.Book;
 import com.example.meltingbooks.network.book.BookApi;
+import com.example.meltingbooks.network.book.BookController;
 import com.example.meltingbooks.network.goal.GoalApi;
 import com.example.meltingbooks.network.goal.GoalController;
 import com.example.meltingbooks.network.goal.GoalResponse;
 import com.example.meltingbooks.network.log.LogApi;
 import com.example.meltingbooks.network.log.LogController;
 import com.example.meltingbooks.network.log.ReadingLogResponse;
-import com.example.meltingbooks.network.book.BookController;
 
-
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -129,14 +125,14 @@ public class CalendarContentFragment extends Fragment {
             });
         }
 
-        GoalApi apiService = ApiClient.getClient(requireContext(), token).create(GoalApi.class);
+        GoalApi apiService = ApiClient.getClient(token).create(GoalApi.class);
         goalController = new GoalController(apiService);
 
         // onCreateView()에서
-        LogApi logApi = ApiClient.getClient(requireContext(), token).create(LogApi.class);
+        LogApi logApi = ApiClient.getClient(token).create(LogApi.class);
         logController = new LogController(logApi);
 
-        BookApi bookApi = ApiClient.getClient(requireContext(), token).create(BookApi.class);
+        BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
         bookController = new BookController(getContext());
 
         // 월간 불러오기
@@ -185,7 +181,7 @@ public class CalendarContentFragment extends Fragment {
         int month = currentCalendar.get(Calendar.MONTH);
 
         // 달 이름 표시
-        java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.ENGLISH);
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
         textMonth.setText(monthFormat.format(currentCalendar.getTime()));
 
         // 1일이 무슨 요일인지 계산 (0:일 ~ 6:토)
@@ -293,9 +289,9 @@ public class CalendarContentFragment extends Fragment {
                 if (goals != null && !goals.isEmpty()) {
 
                     // 현재 날짜 구하기
-                    java.util.Calendar calendar = java.util.Calendar.getInstance();
-                    int currentYear = calendar.get(java.util.Calendar.YEAR);
-                    int currentMonth = calendar.get(java.util.Calendar.MONTH) + 1; // 0부터 시작하므로 +1
+                    Calendar calendar = Calendar.getInstance();
+                    int currentYear = calendar.get(Calendar.YEAR);
+                    int currentMonth = calendar.get(Calendar.MONTH) + 1; // 0부터 시작하므로 +1
 
                     GoalResponse selectedGoal = null;
 
@@ -416,7 +412,7 @@ public class CalendarContentFragment extends Fragment {
 
         if (logs != null) {
             for (ReadingLogResponse log : logs) {
-                int bookId = log.getBookId();
+                Integer bookId = log.getBookId();
 
                 //bookId 기반으로 책 상세 조회
                 bookController.getBookDetail(bookId, new retrofit2.Callback<Book>() {

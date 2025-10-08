@@ -87,7 +87,7 @@ public class SettingProfile extends AppCompatActivity {
         btnSave = findViewById(R.id.bnt_setting_save);
         btnProfileImage = findViewById(R.id.bnt_ProfileImage);
 
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
 
         // 기존 프로필 불러오기
         loadUserProfile();

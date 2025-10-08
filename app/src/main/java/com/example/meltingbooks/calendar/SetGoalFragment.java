@@ -25,9 +25,6 @@ import com.google.gson.Gson;
 import java.time.LocalDate;
 import java.util.List;
 
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class SetGoalFragment extends Fragment {
 
     private GoalController goalController;
@@ -61,7 +58,7 @@ public class SetGoalFragment extends Fragment {
         token = prefs.getString("jwt", null);
         userId = prefs.getInt("userId", -1);
 
-        GoalApi apiService = ApiClient.getClient(requireContext(), token).create(GoalApi.class);
+        GoalApi apiService = ApiClient.getClient(token).create(GoalApi.class);
         goalController = new GoalController(apiService);
 
         // 초기 상태 (월간 선택)

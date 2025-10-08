@@ -109,8 +109,8 @@ public class GroupFeedActivity extends BaseActivity implements GroupGoalSetting.
             return;
         }
 
-        groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        groupApi = ApiClient.getClient(token).create(GroupApi.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
 
         // 그룹 Id
         groupId = getIntent().getIntExtra("groupId", -1);
@@ -333,7 +333,7 @@ public class GroupFeedActivity extends BaseActivity implements GroupGoalSetting.
 
     private void loadGroupFeeds(int groupId) {
 
-        groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+        groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         Call<ApiResponse<GroupFeedPageResponse>> call =
                 groupApi.getGroupFeed("Bearer " + token, groupId, 0, 10);
@@ -396,8 +396,8 @@ public class GroupFeedActivity extends BaseActivity implements GroupGoalSetting.
 
                             // 여기서 포맷
                             String createdAtFormatted = post.getCreatedAt();
-                            if (createdAtFormatted != null && createdAtFormatted.length() >= 16) {
-                                createdAtFormatted = createdAtFormatted.substring(0, 16).replace("T", " ");
+                            if (createdAtFormatted != null && createdAtFormatted.length() >= 19) {
+                                createdAtFormatted = createdAtFormatted.substring(0, 19).replace("T", " ");
                             }
 
                             GroupFeedItem item = new GroupFeedItem(

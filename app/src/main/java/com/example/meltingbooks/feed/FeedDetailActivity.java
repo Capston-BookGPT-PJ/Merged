@@ -178,7 +178,7 @@ public class FeedDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
         bookController = new BookController(this);
     }
 
@@ -198,7 +198,7 @@ public class FeedDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "게시글 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            apiService = ApiClient.getClient(this, token).create(ApiService.class);
+            apiService = ApiClient.getClient(token).create(ApiService.class);
 
             apiService.deleteReview("Bearer " + token, postId, currentUserId)
                     .enqueue(new Callback<Void>() {

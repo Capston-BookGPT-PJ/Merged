@@ -139,7 +139,7 @@ public class UserResponse {
         private String imageUrl;
         private  int rating;
         private  int userId;
-        private  int bookId;
+        private  Integer bookId;
         private String createdAt;
 
 
@@ -179,10 +179,10 @@ public class UserResponse {
             this.userId = userId;
         }
 
-        public int getBookId() {
+        public Integer getBookId() {
             return bookId;
         }
-        public void setBookId(int bookId) {
+        public void setBookId(Integer bookId) {
             this.bookId = bookId;
         }
 

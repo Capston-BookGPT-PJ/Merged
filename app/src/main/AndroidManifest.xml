@@ -105,7 +105,7 @@
         <activity android:name=".group.profile.GroupProfileActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
         <activity android:name=".group.profile.GroupUpdateActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
         <activity android:name=".group.GroupDetailActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
-        <activity android:name=".search.SearchActivity" android:windowSoftInputMode="stateVisible|adjustResize" android:exported="true"/>
+        <activity android:name=".search.SearchActivity" android:windowSoftInputMode="adjustResize" android:exported="true"/>
 
     </application>
 </manifest>

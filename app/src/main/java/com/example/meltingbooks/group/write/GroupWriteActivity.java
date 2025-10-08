@@ -432,6 +432,7 @@ public class GroupWriteActivity extends AppCompatActivity {
                     break;
             }
 
+
             SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
             token = prefs.getString("jwt", null);
             int userId = prefs.getInt("userId", -1);
@@ -442,7 +443,7 @@ public class GroupWriteActivity extends AppCompatActivity {
             }
 
 
-            GroupApi groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+            GroupApi groupApi = ApiClient.getClient(token).create(GroupApi.class);
             Call<ApiResponse<GroupReviewResponse>> call;
 
             if (isEdit) {
@@ -809,7 +810,7 @@ public class GroupWriteActivity extends AppCompatActivity {
             return;
         }
 
-        GroupApi groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+        GroupApi groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         // 단일 게시글 조회
         groupApi.getPost("Bearer " + token, groupId, postId, userId)

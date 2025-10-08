@@ -146,7 +146,7 @@ public class FeedActivity extends BaseActivity {
             return;
         }
 
-        ApiService apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
         isLoading = true; // ⭐ 로딩 시작
 

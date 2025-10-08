@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,7 +55,7 @@ public class MonthlyReportFragment extends Fragment {
         token = prefs.getString("jwt", null);
         userId = prefs.getInt("userId", -1);
 
-        GoalApi apiService = ApiClient.getClient(requireContext(), token).create(GoalApi.class);
+        GoalApi apiService = ApiClient.getClient(token).create(GoalApi.class);
         goalController = new GoalController(apiService);
 
         TextView btnMonthly = view.findViewById(R.id.set_goal_monthly);

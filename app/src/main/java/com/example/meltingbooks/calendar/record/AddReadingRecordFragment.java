@@ -2,7 +2,6 @@ package com.example.meltingbooks.calendar.record;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.meltingbooks.R;
-import com.example.meltingbooks.calendar.utils.BookListHelper;
 import com.example.meltingbooks.calendar.utils.BookListHelper.BookItem;
 import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
@@ -46,7 +44,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -70,7 +67,7 @@ public class AddReadingRecordFragment extends Fragment {
     private TextView btnSave, btnDelete;
 
     // 선택한 책 bookId
-    private int selectedBookId = -1;
+    private Integer selectedBookId = -1;
     private boolean isBookSearchInitialized = false;
     private int currentLogId = -1; // 수정/삭제 시 필요
 
@@ -97,9 +94,9 @@ public class AddReadingRecordFragment extends Fragment {
         token = prefs.getString("jwt", null);
         userId = prefs.getInt("userId", -1);
 
-        // LogApi 초기화
-        LogApi logApi = ApiClient.getClient(requireContext(), token).create(LogApi.class);
+        LogApi logApi = ApiClient.getClient(token).create(LogApi.class);
         logController = new LogController(logApi);
+
 
         // 저장 버튼
         btnSave.setOnClickListener(v -> saveOrUpdateLog());
@@ -241,11 +238,11 @@ public class AddReadingRecordFragment extends Fragment {
                     bookController.searchBooks(query, new Callback<BookResponse>() {
                         @Override
                         public void onResponse(Call<BookResponse> call, Response<BookResponse> response) {
-
-                            List<Book> books = response.body().getData();
                             filteredBookList.clear();
-                            if (response.isSuccessful() && response.body() != null) {
-                                filteredBookList.addAll(books);
+                            if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                                filteredBookList.addAll(response.body().getData());
+                            } else {
+                                Log.e("BookSearch", "검색 실패: " + response.code() + " / " + response.message());
                             }
                             bookAdapter.notifyDataSetChanged();
                         }
@@ -295,9 +292,7 @@ public class AddReadingRecordFragment extends Fragment {
         );
 
         // BookApi 사용
-        // 책 생성할 때 BookApi
-        BookApi bookApi = ApiClient.getClient(requireContext(), token).create(BookApi.class);
-
+        BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
         bookApi.createBook("Bearer " + token, request).enqueue(new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
@@ -445,59 +440,59 @@ public class AddReadingRecordFragment extends Fragment {
             }
         });
     }
-    private List<BookListHelper.BookItem> bookItems = new ArrayList<>();
+    private List<BookItem> bookItems = new ArrayList<>();
 
     /**private void fillInputsWithLog(ReadingLogResponse log) {
-     // 페이지/시간 세팅
-     editPage.setText(String.valueOf(log.getPagesRead()));
-     int totalMinutes = log.getMinutesRead();
-     int hours = totalMinutes / 60;
-     int minutes = totalMinutes % 60;
-     editHours.setText(String.valueOf(hours));
-     editMinutes.setText(String.valueOf(minutes));
+        // 페이지/시간 세팅
+        editPage.setText(String.valueOf(log.getPagesRead()));
+        int totalMinutes = log.getMinutesRead();
+        int hours = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+        editHours.setText(String.valueOf(hours));
+        editMinutes.setText(String.valueOf(minutes));
 
-     // 선택된 책 ID
-     selectedBookId = log.getBookId();
+        // 선택된 책 ID
+        selectedBookId = log.getBookId();
 
-     // 검색창 숨기고 책 정보만 표시
-     if (feedBookSearch != null) feedBookSearch.setVisibility(View.GONE);
-     if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.VISIBLE);
+        // 검색창 숨기고 책 정보만 표시
+        if (feedBookSearch != null) feedBookSearch.setVisibility(View.GONE);
+        if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.VISIBLE);
 
-     // 서버에서 책 상세 정보 가져오기
-     BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
-     BookController tempController = new BookController(getContext());
+        // 서버에서 책 상세 정보 가져오기
+        BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
+        BookController tempController = new BookController(getContext());
 
-     tempController.getBookDetail(selectedBookId, new retrofit2.Callback<Book>() {
-    @Override
-    public void onResponse(Call<Book> call, Response<Book> response) {
-    if (response.isSuccessful() && response.body() != null) {
-    Book book = response.body();
-    bookInfoTitle.setText(book.getTitle());
-    bookInfoAuthor.setText(book.getAuthor());
-    bookInfoPublisher.setText(book.getPublisher());
-    bookInfoCategory.setText(book.getCategoryName());
-    Glide.with(requireContext()).load(book.getCover()).into(bookCover);
+        tempController.getBookDetail(selectedBookId, new retrofit2.Callback<Book>() {
+            @Override
+            public void onResponse(Call<Book> call, Response<Book> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Book book = response.body();
+                    bookInfoTitle.setText(book.getTitle());
+                    bookInfoAuthor.setText(book.getAuthor());
+                    bookInfoPublisher.setText(book.getPublisher());
+                    bookInfoCategory.setText(book.getCategoryName());
+                    Glide.with(requireContext()).load(book.getCover()).into(bookCover);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Book> call, Throwable t) {
+                Log.e("AddReadingRecord", "책 상세 조회 실패", t);
+            }
+        });
     }
-    }
 
-    @Override
-    public void onFailure(Call<Book> call, Throwable t) {
-    Log.e("AddReadingRecord", "책 상세 조회 실패", t);
-    }
-    });
-     }
-
-     private void clearInputs() {
-     editPage.setText("");
-     editHours.setText("");
-     editMinutes.setText("");
-     selectedBookId = -1;
+    private void clearInputs() {
+        editPage.setText("");
+        editHours.setText("");
+        editMinutes.setText("");
+        selectedBookId = -1;
 
 
-     // 기록이 없으면 검색창 다시 보이게
-     if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.GONE);
-     if (feedBookSearch != null) feedBookSearch.setVisibility(View.VISIBLE);
-     }*/
+        // 기록이 없으면 검색창 다시 보이게
+        if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.GONE);
+        if (feedBookSearch != null) feedBookSearch.setVisibility(View.VISIBLE);
+    }*/
     private void fillInputsWithLog(ReadingLogResponse log) {
         // 페이지/시간 세팅
         editPage.setText(String.valueOf(log.getPagesRead()));
@@ -518,11 +513,9 @@ public class AddReadingRecordFragment extends Fragment {
         if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.VISIBLE);
 
         // ✅ 서버에서 책 상세 정보 가져오기
-        // 책 생성할 때 BookApi
-        BookApi bookApi = ApiClient.getClient(requireContext(), token).create(BookApi.class);
-
+        BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
         BookController tempController = new BookController(getContext());
-        tempController.getBookDetail(selectedBookId, new retrofit2.Callback<Book>() {
+        tempController.getBookDetail(selectedBookId, new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
                 if (response.isSuccessful() && response.body() != null) {

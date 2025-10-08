@@ -129,8 +129,8 @@ public class GroupDetailActivity extends AppCompatActivity {
             return;
         }
 
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
-        groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
+        groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         // FeedAdpater.java에서 FeedItem 받아오기
         currentFeed = (GroupFeedItem) getIntent().getSerializableExtra("groupFeedItem");
@@ -193,7 +193,7 @@ public class GroupDetailActivity extends AppCompatActivity {
                 Toast.makeText(this, "게시글 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            groupApi =  ApiClient.getClient(this, token).create(GroupApi.class);
+            groupApi =  ApiClient.getClient(token).create(GroupApi.class);
 
             groupApi.deletePost("Bearer " + token, groupId, postId)
                     .enqueue(new Callback<Void>() {
@@ -286,7 +286,6 @@ public class GroupDetailActivity extends AppCompatActivity {
 
         // TextView에 설정
         postTypeContent.setText(displayType);
-
 
     }
 

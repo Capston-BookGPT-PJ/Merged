@@ -142,7 +142,7 @@ public class BrowseActivity extends BaseActivity {
             setupHashtags(token);
         }
 
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
 
         //인기 책 목록 가져오기
         loadPopularBooks();
@@ -316,7 +316,7 @@ public class BrowseActivity extends BaseActivity {
     }
 
     private void setupHashtags(String token) {
-        HashtagController hashtagController = new HashtagController(this, token);
+        HashtagController hashtagController = new HashtagController(token);
 
         hashtagController.fetchPopularHashtags(new Callback<ApiResponse<List<HashtagResponse>>>() {
             @Override
@@ -480,7 +480,7 @@ public class BrowseActivity extends BaseActivity {
         String token = prefs.getString("jwt", null);
         if (token == null) return;
 
-        UserController userController = new UserController(this, token);
+        UserController userController = new UserController(token);
         userController.fetchPopularUsers(new UserController.PopularUsersCallback() {
             @Override
             public void onSuccess(List<PopularUser> users) {

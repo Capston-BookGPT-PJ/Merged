@@ -1,16 +1,35 @@
 package com.example.meltingbooks.login;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.meltingbooks.R;
+import com.example.meltingbooks.feed.FeedActivity;
+import com.example.meltingbooks.network.browse.PopularUser;
+import com.example.meltingbooks.network.browse.UserController;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.List;
+import java.util.Scanner;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -41,13 +60,13 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
-        public void showFragment(Fragment fragment) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    .addToBackStack(null)  // 뒤로가기 지원
-                    .commit();
-        }
+    public void showFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null)  // 뒤로가기 지원
+                .commit();
+    }
 
 
 }

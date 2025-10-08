@@ -131,7 +131,7 @@ public class FeedWriteActivity extends AppCompatActivity {
     private TextView bookInfoTitle, bookInfoAuthor, bookInfoPublisher, bookInfoCategory; //제목 저자 출판사 카테고리
 
    // 선택한 책 bookId와 별점(전달용)
-    private int selectedBookId = -1;
+    private Integer selectedBookId = -1;
     private int selectedBookRating = 0;
     private boolean isBookSearchInitialized = false;
 
@@ -383,7 +383,7 @@ public class FeedWriteActivity extends AppCompatActivity {
 
             }
 
-            ApiService apiService = ApiClient.getClient(this, token).create(ApiService.class);
+            ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
 
             //게시슬 수정 기능 추가
@@ -392,10 +392,11 @@ public class FeedWriteActivity extends AppCompatActivity {
             if (isEdit) {
                  // 수정 모드: 모든 필드 포함
                 String imageUrl = selectedImageUri != null ? selectedImageUri.toString() : null;
+                Integer safeBookId = (selectedBookId != null && selectedBookId != -1) ? selectedBookId : null;
                 ReviewUpdateRequest updateRequest = new ReviewUpdateRequest(
                         content,
                         imageUrl,
-                        selectedBookId != -1 ? selectedBookId : null,  // 선택한 책 ID
+                        safeBookId, // 선택한 책 ID
                         selectedBookRating != 0 ? selectedBookRating : null,  // 별점
                         hashtags.isEmpty() ? null : hashtags
                 );
@@ -409,9 +410,10 @@ public class FeedWriteActivity extends AppCompatActivity {
 
 
             } else {
+                Integer safeBookId = (selectedBookId != null && selectedBookId != -1) ? selectedBookId : null;
                 // 생성 모드: bookId, rating, hashtags 조건부 전달
                 ReviewRequest createRequest = new ReviewRequest(
-                        selectedBookId != -1 ? selectedBookId : null,
+                        safeBookId,
                         content,
                         selectedBookRating != 0 ? selectedBookRating : null,
                         hashtags.isEmpty() ? null : hashtags
@@ -836,7 +838,7 @@ public class FeedWriteActivity extends AppCompatActivity {
 
         //Book 객체에 저장(bookId 저장->selectedBookId)
         // BookApi 사용
-        BookApi bookApi = ApiClient.getClient(this, token).create(BookApi.class);
+        BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
         bookApi.createBook("Bearer " + token, request).enqueue(new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
@@ -865,7 +867,7 @@ public class FeedWriteActivity extends AppCompatActivity {
             return;
         }
 
-        ApiService apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
         apiService.getReviewDetail("Bearer " + token, postId, userId)
                 .enqueue(new Callback<ApiResponse<FeedResponse>>() {
                     @Override

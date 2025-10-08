@@ -1,6 +1,5 @@
 package com.example.meltingbooks.network.browse;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.meltingbooks.network.ApiClient;
@@ -15,17 +14,15 @@ import retrofit2.Callback;
 
 public class HashtagController {
     private ApiService apiService;
-    private Context context;
 
     // 토큰을 외부에서 주입받도록 생성자 수정
-    public HashtagController(Context context, String token) {
-        this.context = context;
+    public HashtagController(String token) {
 
         if (token == null) {
             Log.e("HashtagController", "JWT 토큰이 없습니다.");
             return;
         }
-        apiService = ApiClient.getClient(context, token).create(ApiService.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
 
     }
 

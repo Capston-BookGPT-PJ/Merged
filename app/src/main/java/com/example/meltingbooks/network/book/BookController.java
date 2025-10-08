@@ -33,8 +33,8 @@ public class BookController {
             return;
         }
 
-        bookApi = ApiClient.getClient(context, token).create(BookApi.class);
-        apiService = ApiClient.getClient(context, token).create(ApiService.class);
+        bookApi = ApiClient.getClient(token).create(BookApi.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
     }
 
     // 전체 책 리스트 가져오기

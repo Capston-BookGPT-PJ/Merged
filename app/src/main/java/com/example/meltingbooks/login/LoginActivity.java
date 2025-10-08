@@ -1,7 +1,6 @@
 package com.example.meltingbooks.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -58,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
 
+
         // 네이버 로그인 클릭 이벤트
         naverLoginBtn.setOnClickListener(v -> {
             String loginUrl = "http://meltingbooks.o-r.kr:8080/auth/NAVER";
@@ -92,14 +92,5 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, FeedActivity.class);
             startActivity(intent);
         });
-    }
-
-    // ✅ 자동로그인용 SharedPreferences 저장 메서드
-    private void saveLoginSession(String token, int userId) {
-        SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("jwt", token);
-        editor.putInt("userId", userId);
-        editor.apply();
     }
 }

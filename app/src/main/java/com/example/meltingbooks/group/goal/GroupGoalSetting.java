@@ -56,13 +56,12 @@ public class GroupGoalSetting extends Fragment {
         editTime = view.findViewById(R.id.edit_time);
 
         // 목표/Progress UI
-        /*
         goalBooks = view.findViewById(R.id.goal_books);
         goalReviews = view.findViewById(R.id.goal_reviews);
         goalTime = view.findViewById(R.id.goal_time);
         progressBooks = view.findViewById(R.id.progress_books);
         progressReviews = view.findViewById(R.id.progress_reviews);
-        progressTime = view.findViewById(R.id.progress_time);*/
+        progressTime = view.findViewById(R.id.progress_time);
 
         // 초기 상태: 월간 선택
         btnMonthly.setSelected(true);
@@ -87,7 +86,7 @@ public class GroupGoalSetting extends Fragment {
         });
 
         // groupArrow 클릭 처리
-        /*ImageView groupArrow = view.findViewById(R.id.group_arrow);
+        ImageView groupArrow = view.findViewById(R.id.group_arrow);
         if (groupArrow != null) {
             groupArrow.setOnClickListener(v -> {
                 getParentFragmentManager().beginTransaction()
@@ -95,7 +94,7 @@ public class GroupGoalSetting extends Fragment {
                         .addToBackStack(null)
                         .commit();
             });
-        }*/
+        }
 
         return view;
     }

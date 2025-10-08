@@ -20,7 +20,7 @@ public class LogController {
     }
 
 
-    public void createLog(String token, int userId, int bookId, ReadingLogRequest request,
+    public void createLog(String token, int userId, Integer bookId, ReadingLogRequest request,
                           Callback<ApiResponse<ReadingLogResponse>> callback) {
         logApi.createLog("Bearer " + token, userId, bookId, request).enqueue(callback);
     }

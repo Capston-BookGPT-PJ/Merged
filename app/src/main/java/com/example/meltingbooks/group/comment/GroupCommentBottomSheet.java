@@ -116,7 +116,7 @@ public class GroupCommentBottomSheet extends BottomSheetDialogFragment {
                 int userId = prefs.getInt("userId", -1); // 기본값 -1
                 if (token == null) return;
 
-                ApiService apiService = ApiClient.getClient(requireContext(), token).create(ApiService.class);
+                ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
                 CommentRequest request = new CommentRequest(commentText);
 
@@ -165,7 +165,7 @@ public class GroupCommentBottomSheet extends BottomSheetDialogFragment {
         String token = prefs.getString("jwt", null);
         if (token == null) return;
 
-        ApiService apiService = ApiClient.getClient(requireContext(), token).create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
         apiService.getComments("Bearer " + token, postId)
                 .enqueue(new Callback<ApiResponse<List<CommentResponse>>>() {

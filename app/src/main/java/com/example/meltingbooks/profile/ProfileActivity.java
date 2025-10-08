@@ -177,7 +177,7 @@ public class ProfileActivity extends BaseActivity {
             return;
         }
 
-        ApiService apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
         Call<ApiResponse<UserResponse>> call = apiService.getUserProfile("Bearer " + token, viewedUserId);
 
         call.enqueue(new Callback<ApiResponse<UserResponse>>() {
@@ -253,7 +253,7 @@ public class ProfileActivity extends BaseActivity {
 
     private void checkFollowStatus() {
         String token = getSharedPreferences("auth", MODE_PRIVATE).getString("jwt", null);
-        FollowApi followApi = ApiClient.getClient(this, token).create(FollowApi.class);
+        FollowApi followApi = ApiClient.getClient(token).create(FollowApi.class);
 
         // 내 팔로잉 목록 조회해서 상대방 있는지 확인
         followApi.getFollowing("Bearer " + token, myUserId).enqueue(new Callback<ApiResponse<List<FollowUser>>>() {
@@ -281,7 +281,7 @@ public class ProfileActivity extends BaseActivity {
 
     private void toggleFollow() {
         String token = getSharedPreferences("auth", MODE_PRIVATE).getString("jwt", null);
-        FollowApi followApi = ApiClient.getClient(this, token).create(FollowApi.class);
+        FollowApi followApi = ApiClient.getClient(token).create(FollowApi.class);
 
         if (isFollowing) {
             // 언팔로우

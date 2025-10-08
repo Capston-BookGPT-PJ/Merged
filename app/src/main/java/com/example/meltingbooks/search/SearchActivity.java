@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -86,7 +85,7 @@ public class SearchActivity extends AppCompatActivity {
     private List<FeedItem> reviewList = new ArrayList<>();
 
     // 선택한 책 bookId와 별점(전달용)
-    private int selectedBookId = -1;
+    private Integer selectedBookId = -1;
     private int selectedBookRating = 0;
 
 
@@ -309,7 +308,7 @@ public class SearchActivity extends AppCompatActivity {
         searchHashtagRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         searchHashtagRecyclerView.setAdapter(hashtagAdapter);
 
-        apiService = ApiClient.getClient(this, token).create(ApiService.class);
+        apiService = ApiClient.getClient(token).create(ApiService.class);
 
         // 클릭 리스너 연결
         hashtagAdapter.setOnItemClickListener(hashtag -> {
@@ -321,7 +320,7 @@ public class SearchActivity extends AppCompatActivity {
             searchItemText.setText(hashtag.getTag());
 
             // 해시태그 리뷰 불러오기
-            HashtagController hashtagController = new HashtagController(this, token);
+            HashtagController hashtagController = new HashtagController(token);
             hashtagController.fetchReviewsByHashtag(hashtag.getTag(), new Callback<ApiResponse<FeedPageResponse>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<FeedPageResponse>> call,
@@ -412,10 +411,6 @@ public class SearchActivity extends AppCompatActivity {
             }
             return false;
         });
-        searchInput.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT);
-
     }
 
 
@@ -508,7 +503,7 @@ public class SearchActivity extends AppCompatActivity {
                 hashTagInfoSelected.setVisibility(View.GONE);
 
 
-                UserController userController = new UserController(this, token);
+                UserController userController = new UserController(token);
 
                 if (!TextUtils.isEmpty(query)) {
                     // 검색어가 있으면 서버에서 검색
@@ -709,7 +704,7 @@ private void fetchPopularReviews() {
     }
 
     private void loadAllHashtags(String token) {
-        HashtagController hashtagController = new HashtagController(this, token);
+        HashtagController hashtagController = new HashtagController(token);
 
         hashtagController.fetchPopularHashtags(new Callback<ApiResponse<List<HashtagResponse>>>() {
             @Override

@@ -194,7 +194,7 @@ public class GroupCreateActivity extends AppCompatActivity {
         Group group = new Group(name, description, groupImageUrl, category);
 
 
-        GroupApi groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+        GroupApi groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         // 그룹 단일 타입-> GroupSingleList 사용
         groupApi.createGroup(group).enqueue(new retrofit2.Callback<GroupPostResponse>() {

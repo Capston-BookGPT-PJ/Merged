@@ -31,13 +31,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
-
-    //token 추가
-    @POST("/test/token")
-    Call<RefreshResponse> refreshToken(
-            @Body RefreshRequest request
-    );
-
     // 사용자 프로필 조회 API
     @GET("/api/users/{id}")
     Call<UserResponse> getUser(

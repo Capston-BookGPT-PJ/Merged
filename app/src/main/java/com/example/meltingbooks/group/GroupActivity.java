@@ -118,7 +118,7 @@ public class GroupActivity extends BaseActivity {
         myGroup3 = findViewById(R.id.myGroup3);
         groupButtons = Arrays.asList(myGroup1, myGroup2, myGroup3);
 
-        groupApi = ApiClient.getClient(this, token).create(GroupApi.class);
+        groupApi = ApiClient.getClient(token).create(GroupApi.class);
 
         // 3️⃣ 내 그룹 가져오기
         loadMyGroups();
