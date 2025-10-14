@@ -349,9 +349,9 @@ public class DetailGoalFragment extends Fragment {
         TextView title = getView().findViewById(R.id.reading_goal); // fragment_detail_goal.xml 안에 제목 TextView 있어야 함
 
         if ("MONTHLY".equalsIgnoreCase(goal.getGoalType())) {
-            title.setText(goal.getMonth() + "월 독서 목표 설정");
+            title.setText(goal.getMonth() + "월 독서 목표 달성 현황");
         } else if ("YEARLY".equalsIgnoreCase(goal.getGoalType())) {
-            title.setText(goal.getYear() + "년 독서 목표 설정");
+            title.setText(goal.getYear() + "년 독서 목표 달성 현황");
         }
 
 
