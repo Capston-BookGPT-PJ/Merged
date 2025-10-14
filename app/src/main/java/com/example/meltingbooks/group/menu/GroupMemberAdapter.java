@@ -1,6 +1,5 @@
 package com.example.meltingbooks.group.menu;
 
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.meltingbooks.profile.ProfileActivity;
 import com.example.meltingbooks.R;
+import com.example.meltingbooks.profile.ProfileActivity;
 
 import java.util.List;
 

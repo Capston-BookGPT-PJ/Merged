@@ -23,7 +23,6 @@ import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
 import com.example.meltingbooks.network.ApiService;
 import com.example.meltingbooks.network.book.Book;
-import com.example.meltingbooks.network.book.BookApi;
 import com.example.meltingbooks.network.book.BookController;
 import com.example.meltingbooks.profile.ProfileActivity;
 
@@ -32,11 +31,9 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 //피드 갱신용
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder> {
 
