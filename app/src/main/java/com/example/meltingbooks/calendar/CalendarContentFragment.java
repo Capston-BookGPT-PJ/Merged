@@ -17,6 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -29,16 +35,15 @@ import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
 import com.example.meltingbooks.network.book.Book;
 import com.example.meltingbooks.network.book.BookApi;
-import com.example.meltingbooks.network.book.BookController;
 import com.example.meltingbooks.network.goal.GoalApi;
 import com.example.meltingbooks.network.goal.GoalController;
 import com.example.meltingbooks.network.goal.GoalResponse;
 import com.example.meltingbooks.network.log.LogApi;
 import com.example.meltingbooks.network.log.LogController;
 import com.example.meltingbooks.network.log.ReadingLogResponse;
+import com.example.meltingbooks.network.book.BookController;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -151,7 +156,6 @@ public class CalendarContentFragment extends Fragment {
 
     //달력 생성 알고리즘
     private void updateCalendar(View view) {
-        // 요일 표시
         LinearLayout weekdaysRow = view.findViewById(R.id.weekdaysRow);
         weekdaysRow.removeAllViews();
 
@@ -161,115 +165,247 @@ public class CalendarContentFragment extends Fragment {
             dayLabel.setText(weekdays[i]);
             dayLabel.setTextSize(14);
             dayLabel.setGravity(Gravity.CENTER);
-            dayLabel.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            LinearLayout.LayoutParams params =
+                    new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+            dayLabel.setLayoutParams(params);
 
-            // 색상 지정
-            if (i == 0) {
-                dayLabel.setTextColor(Color.parseColor("#FC1F8E")); // 일요일
-            } else if (i == 6) {
-                dayLabel.setTextColor(Color.parseColor("#1D9BF0")); // 토요일
-            } else {
-                dayLabel.setTextColor(Color.BLACK); // 평일
-            }
+            if (i == 0)
+                dayLabel.setTextColor(Color.parseColor("#FC1F8E"));
+            else if (i == 6)
+                dayLabel.setTextColor(Color.parseColor("#1D9BF0"));
+            else
+                dayLabel.setTextColor(Color.BLACK);
 
             weekdaysRow.addView(dayLabel);
         }
 
         calendarGrid.removeAllViews();
 
-        // 현재 월의 정보
         int year = currentCalendar.get(Calendar.YEAR);
         int month = currentCalendar.get(Calendar.MONTH);
 
-        // 달 이름 표시
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM yyyy", Locale.ENGLISH);
+        java.text.SimpleDateFormat monthFormat =
+                new java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.ENGLISH);
         textMonth.setText(monthFormat.format(currentCalendar.getTime()));
 
-        // 1일이 무슨 요일인지 계산 (0:일 ~ 6:토)
         Calendar tempCal = Calendar.getInstance();
         tempCal.set(year, month, 1);
         int startDayOfWeek = tempCal.get(Calendar.DAY_OF_WEEK) - 1;
-
         int maxDay = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        // 빈칸 먼저 채우기
+        // 빈칸 채우기
         for (int i = 0; i < startDayOfWeek; i++) {
             TextView emptyView = new TextView(getContext());
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            params.columnSpec = GridLayout.spec(i, 1f);
+            params.setMargins(1, 5, 1, 5); // ✅ 수평/수직 간격 줄임
             emptyView.setLayoutParams(params);
             calendarGrid.addView(emptyView);
         }
 
-        //날짜 채우기
         for (int day = 1; day <= maxDay; day++) {
-            TextView dayView = new TextView(getContext());
-            dayView.setText(String.valueOf(day));
-            dayView.setGravity(Gravity.CENTER);
-            dayView.setTextSize(16);
-            dayView.setPadding(8, 8, 8, 8);
+            // ✅ 각 날짜 셀을 감싸는 ConstraintLayout
+            ConstraintLayout cellLayout = new ConstraintLayout(getContext());
+            GridLayout.LayoutParams cellParams = new GridLayout.LayoutParams();
+            cellParams.width = 0;
+            cellParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            cellParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            cellParams.setMargins(1, 5, 1, 5); // ✅ 수평/수직 간격 줄임
+            cellLayout.setLayoutParams(cellParams);
 
-            // 크기 설정 (정사각형)
-            int sizeInDp = 35;
-            int sizeInPx = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, sizeInDp, getResources().getDisplayMetrics()
+            // ✅ 날짜 TextView 생성
+            TextView dayView = new TextView(getContext());
+            dayView.setId(View.generateViewId());
+            dayView.setText(String.valueOf(day));
+            dayView.setTextSize(16);
+            dayView.setGravity(Gravity.CENTER);
+            dayView.setTextColor(Color.BLACK);
+
+            // ConstraintLayout 안에 넣기 위한 파라미터
+            /**ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+             0, 0
+             );*/
+
+            // ✅ 원 크기 줄이기
+            int circleSizeInDp = 30; // 원하는 원 크기 (기존보다 작게)
+            int circleSizeInPx = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, circleSizeInDp, getResources().getDisplayMetrics()
             );
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = sizeInPx;
-            params.height = sizeInPx;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED);
+
+            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                    circleSizeInPx, circleSizeInPx
+            );
+
+            // ✅ 정사각형 비율 강제
+            params.dimensionRatio = "1:1";
+            params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            params.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+            params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
             dayView.setLayoutParams(params);
+
+            cellLayout.addView(dayView);
 
             Calendar thisDate = Calendar.getInstance();
             thisDate.set(year, month, day);
 
-            // 초기 스타일 적용
-            if (thisDate.get(Calendar.YEAR) == selectedDate.get(Calendar.YEAR) &&
-                    thisDate.get(Calendar.MONTH) == selectedDate.get(Calendar.MONTH) &&
-                    thisDate.get(Calendar.DAY_OF_MONTH) == selectedDate.get(Calendar.DAY_OF_MONTH)) {
+            // ✅ 선택된 날짜 배경
+            if (thisDate.get(Calendar.YEAR) == selectedDate.get(Calendar.YEAR)
+                    && thisDate.get(Calendar.MONTH) == selectedDate.get(Calendar.MONTH)
+                    && thisDate.get(Calendar.DAY_OF_MONTH) == selectedDate.get(Calendar.DAY_OF_MONTH)) {
                 dayView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
+
                 dayView.setTextColor(Color.WHITE);
                 selectedDayView = dayView;
-            } else {
-                dayView.setTextColor(Color.BLACK);
             }
 
-            // 클릭 이벤트 처리
+            // ✅ 클릭 이벤트
             dayView.setOnClickListener(v -> {
-                // 기존 선택 해제
                 if (selectedDayView != null) {
                     selectedDayView.setBackground(null);
                     selectedDayView.setTextColor(Color.BLACK);
                 }
 
-                // 새로 선택
                 selectedDayView = (TextView) v;
                 selectedDayView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
                 selectedDayView.setTextColor(Color.WHITE);
 
-                // 날짜 저장
                 selectedDate.set(year, month, Integer.parseInt(dayView.getText().toString()));
 
-                // 날짜별 기록 표시
                 SimpleDateFormat format = new SimpleDateFormat("M/d (E)", Locale.KOREA);
                 TextView goalByDate = getActivity().findViewById(R.id.goal_by_date);
-                if (goalByDate != null) {
-                    goalByDate.setText(format.format(selectedDate.getTime()));
-                }
+                if (goalByDate != null) goalByDate.setText(format.format(selectedDate.getTime()));
 
-                // 선택한 날짜의 로그 조회
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
-                String selectedDateStr = sdf.format(selectedDate.getTime());
-                loadLogsByDate(selectedDateStr);
-
+                loadLogsByDate(sdf.format(selectedDate.getTime()));
             });
 
-            calendarGrid.addView(dayView);
+            calendarGrid.addView(cellLayout);
         }
-
     }
+
+    /**private void updateCalendar(View view) {
+     // 요일 표시
+     LinearLayout weekdaysRow = view.findViewById(R.id.weekdaysRow);
+     weekdaysRow.removeAllViews();
+
+     String[] weekdays = {"S", "M", "T", "W", "T", "F", "S"};
+     for (int i = 0; i < weekdays.length; i++) {
+     TextView dayLabel = new TextView(getContext());
+     dayLabel.setText(weekdays[i]);
+     dayLabel.setTextSize(14);
+     dayLabel.setGravity(Gravity.CENTER);
+     dayLabel.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+     // 색상 지정
+     if (i == 0) {
+     dayLabel.setTextColor(Color.parseColor("#FC1F8E")); // 일요일
+     } else if (i == 6) {
+     dayLabel.setTextColor(Color.parseColor("#1D9BF0")); // 토요일
+     } else {
+     dayLabel.setTextColor(Color.BLACK); // 평일
+     }
+
+     weekdaysRow.addView(dayLabel);
+     }
+
+     calendarGrid.removeAllViews();
+
+     // 현재 월의 정보
+     int year = currentCalendar.get(Calendar.YEAR);
+     int month = currentCalendar.get(Calendar.MONTH);
+
+     // 달 이름 표시
+     java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.ENGLISH);
+     textMonth.setText(monthFormat.format(currentCalendar.getTime()));
+
+     // 1일이 무슨 요일인지 계산 (0:일 ~ 6:토)
+     Calendar tempCal = Calendar.getInstance();
+     tempCal.set(year, month, 1);
+     int startDayOfWeek = tempCal.get(Calendar.DAY_OF_WEEK) - 1;
+
+     int maxDay = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+     // 빈칸 먼저 채우기
+     for (int i = 0; i < startDayOfWeek; i++) {
+     TextView emptyView = new TextView(getContext());
+     GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+     params.width = 0;
+     params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+     params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+     emptyView.setLayoutParams(params);
+     calendarGrid.addView(emptyView);
+     }
+
+     //날짜 채우기
+     for (int day = 1; day <= maxDay; day++) {
+     TextView dayView = new TextView(getContext());
+     dayView.setText(String.valueOf(day));
+     dayView.setGravity(Gravity.CENTER);
+     dayView.setTextSize(16);
+     dayView.setPadding(8, 8, 8, 8);
+
+     // 크기 설정 (정사각형)
+     int sizeInDp = 35;
+     int sizeInPx = (int) TypedValue.applyDimension(
+     TypedValue.COMPLEX_UNIT_DIP, sizeInDp, getResources().getDisplayMetrics()
+     );
+     GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+     params.width = sizeInPx;
+     params.height = sizeInPx;
+     params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED);
+     dayView.setLayoutParams(params);
+
+     Calendar thisDate = Calendar.getInstance();
+     thisDate.set(year, month, day);
+
+     // 초기 스타일 적용
+     if (thisDate.get(Calendar.YEAR) == selectedDate.get(Calendar.YEAR) &&
+     thisDate.get(Calendar.MONTH) == selectedDate.get(Calendar.MONTH) &&
+     thisDate.get(Calendar.DAY_OF_MONTH) == selectedDate.get(Calendar.DAY_OF_MONTH)) {
+     dayView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
+     dayView.setTextColor(Color.WHITE);
+     selectedDayView = dayView;
+     } else {
+     dayView.setTextColor(Color.BLACK);
+     }
+
+     // 클릭 이벤트 처리
+     dayView.setOnClickListener(v -> {
+     // 기존 선택 해제
+     if (selectedDayView != null) {
+     selectedDayView.setBackground(null);
+     selectedDayView.setTextColor(Color.BLACK);
+     }
+
+     // 새로 선택
+     selectedDayView = (TextView) v;
+     selectedDayView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
+     selectedDayView.setTextColor(Color.WHITE);
+
+     // 날짜 저장
+     selectedDate.set(year, month, Integer.parseInt(dayView.getText().toString()));
+
+     // 날짜별 기록 표시
+     SimpleDateFormat format = new SimpleDateFormat("M/d (E)", Locale.KOREA);
+     TextView goalByDate = getActivity().findViewById(R.id.goal_by_date);
+     if (goalByDate != null) {
+     goalByDate.setText(format.format(selectedDate.getTime()));
+     }
+
+     // 선택한 날짜의 로그 조회
+     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+     String selectedDateStr = sdf.format(selectedDate.getTime());
+     loadLogsByDate(selectedDateStr);
+
+     });
+
+     calendarGrid.addView(dayView);
+     }
+
+     }*/
 
     private List<BookListHelper.BookItem> bookItems = new ArrayList<>();
 
@@ -290,9 +426,9 @@ public class CalendarContentFragment extends Fragment {
                 if (goals != null && !goals.isEmpty()) {
 
                     // 현재 날짜 구하기
-                    Calendar calendar = Calendar.getInstance();
-                    int currentYear = calendar.get(Calendar.YEAR);
-                    int currentMonth = calendar.get(Calendar.MONTH) + 1; // 0부터 시작하므로 +1
+                    java.util.Calendar calendar = java.util.Calendar.getInstance();
+                    int currentYear = calendar.get(java.util.Calendar.YEAR);
+                    int currentMonth = calendar.get(java.util.Calendar.MONTH) + 1; // 0부터 시작하므로 +1
 
                     GoalResponse selectedGoal = null;
 

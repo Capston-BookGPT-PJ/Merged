@@ -284,7 +284,9 @@ public class FeedDetailActivity extends AppCompatActivity {
         // 피드 이미지
         if (feed.getImageUrl() != null && !feed.getImageUrl().isEmpty()) {
             feedImage.setVisibility(View.VISIBLE);
-            Glide.with(this).load(feed.getImageUrl()).into(feedImage);
+            Glide.with(this).load(feed.getImageUrl())
+                    .centerCrop()
+                    .into(feedImage);
         } else {
             feedImage.setVisibility(View.GONE);
         }

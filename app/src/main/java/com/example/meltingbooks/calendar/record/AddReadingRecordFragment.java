@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.meltingbooks.R;
+import com.example.meltingbooks.calendar.utils.BookListHelper;
 import com.example.meltingbooks.calendar.utils.BookListHelper.BookItem;
 import com.example.meltingbooks.network.ApiClient;
 import com.example.meltingbooks.network.ApiResponse;
@@ -49,6 +51,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -194,34 +197,91 @@ public class AddReadingRecordFragment extends Fragment {
 
     }
 
+    /**private void updateWeekDates() {
+     LinearLayout container = rootView.findViewById(R.id.week_date_container);
+     container.removeAllViews();
+
+     // 해당 주의 일요일 찾기
+     LocalDate sunday = selectedDate.minusDays(selectedDate.getDayOfWeek().getValue() % 7);
+
+     for (int i = 0; i < 7; i++) {
+     LocalDate date = sunday.plusDays(i);
+     TextView textView = new TextView(getContext());
+
+     textView.setText(String.valueOf(date.getDayOfMonth()));
+     textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
+     textView.setGravity(Gravity.CENTER);
+     textView.setPadding(24, 16, 24, 16);
+
+     // 정사각형 크기로 설정해서 원으로 보이게
+     int sizeInDp = 35;
+     int sizeInPx = (int) TypedValue.applyDimension(
+     TypedValue.COMPLEX_UNIT_DIP,
+     sizeInDp,
+     getResources().getDisplayMetrics()
+     );
+
+     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(sizeInPx, sizeInPx);
+     textView.setLayoutParams(layoutParams);
+
+     // 선택된 날짜면 회색 원 + 흰색 글씨
+     if (date.equals(selectedDate)) {
+     textView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
+     textView.setTextColor(Color.WHITE);
+     } else {
+     textView.setTextColor(Color.BLACK);
+     }
+
+     // 날짜 클릭 시 선택 표시 갱신
+     textView.setOnClickListener(v -> {
+     selectedDate = date;
+     updateWeekDates();  // 다시 렌더링
+     clearInputs();
+     loadLogForSelectedDate(); // 선택한 날짜 기록 불러오기
+     });
+
+     container.addView(textView);
+     }
+
+     //주차 UI 갱신 후 현재 선택 날짜 기록도 자동 불러오기
+     loadLogForSelectedDate();
+     }*/
     private void updateWeekDates() {
         LinearLayout container = rootView.findViewById(R.id.week_date_container);
         container.removeAllViews();
 
-        // 해당 주의 일요일 찾기
         LocalDate sunday = selectedDate.minusDays(selectedDate.getDayOfWeek().getValue() % 7);
 
         for (int i = 0; i < 7; i++) {
             LocalDate date = sunday.plusDays(i);
+
+            // 1️⃣ 셀: weight로 폭 분배, padding 제거
+            FrameLayout cell = new FrameLayout(getContext());
+            LinearLayout.LayoutParams cellParams = new LinearLayout.LayoutParams(
+                    0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    1.0f
+            );
+            cell.setLayoutParams(cellParams);
+
+            // 2️⃣ 고정 크기 TextView (원)
             TextView textView = new TextView(getContext());
-
-            textView.setText(String.valueOf(date.getDayOfMonth()));
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,16);
-            textView.setGravity(Gravity.CENTER);
-            textView.setPadding(24, 16, 24, 16);
-
-            // 정사각형 크기로 설정해서 원으로 보이게
-            int sizeInDp = 35;
-            int sizeInPx = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    sizeInDp,
-                    getResources().getDisplayMetrics()
+            int circleSizeInDp = 35;
+            int circleSizeInPx = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, circleSizeInDp, getResources().getDisplayMetrics()
             );
 
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(sizeInPx, sizeInPx);
-            textView.setLayoutParams(layoutParams);
+            FrameLayout.LayoutParams textParams = new FrameLayout.LayoutParams(
+                    circleSizeInPx, circleSizeInPx
+            );
+            textParams.gravity = Gravity.CENTER;
+            textView.setLayoutParams(textParams);
 
-            // 선택된 날짜면 회색 원 + 흰색 글씨
+            textView.setText(String.valueOf(date.getDayOfMonth()));
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            textView.setGravity(Gravity.CENTER);
+
+            // 선택된 날짜
             if (date.equals(selectedDate)) {
                 textView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.bg_selected_date));
                 textView.setTextColor(Color.WHITE);
@@ -229,18 +289,17 @@ public class AddReadingRecordFragment extends Fragment {
                 textView.setTextColor(Color.BLACK);
             }
 
-            // 날짜 클릭 시 선택 표시 갱신
             textView.setOnClickListener(v -> {
                 selectedDate = date;
-                updateWeekDates();  // 다시 렌더링
+                updateWeekDates();
                 clearInputs();
-                loadLogForSelectedDate(); // 선택한 날짜 기록 불러오기
+                loadLogForSelectedDate();
             });
 
-            container.addView(textView);
+            cell.addView(textView);
+            container.addView(cell);
         }
 
-        //주차 UI 갱신 후 현재 선택 날짜 기록도 자동 불러오기
         loadLogForSelectedDate();
     }
 
@@ -498,7 +557,7 @@ public class AddReadingRecordFragment extends Fragment {
             }
         });
     }
-    private List<BookItem> bookItems = new ArrayList<>();
+    private List<BookListHelper.BookItem> bookItems = new ArrayList<>();
 
     private void fillInputsWithLog(ReadingLogResponse log) {
         // 시간
@@ -539,7 +598,7 @@ public class AddReadingRecordFragment extends Fragment {
         // ✅ 서버에서 책 상세 정보 가져오기
         BookApi bookApi = ApiClient.getClient(token).create(BookApi.class);
         BookController tempController = new BookController(getContext());
-        tempController.getBookDetail(selectedBookId, new Callback<Book>() {
+        tempController.getBookDetail(selectedBookId, new retrofit2.Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
                 if (response.isSuccessful() && response.body() != null) {
