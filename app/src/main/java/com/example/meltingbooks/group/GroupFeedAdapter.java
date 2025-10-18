@@ -181,8 +181,12 @@ public class GroupFeedAdapter extends RecyclerView.Adapter<GroupFeedAdapter.Grou
         int groupId = item.getGroupId();   // ✅ 그룹 ID 가져오기
         int postId = item.getPostId();
 
-        boolean newState = !item.isLikedByMe(); // 토글
-        item.setLikedByMe(newState);
+        boolean oldState = item.isLikedByMe();   // ✅ 기존 상태
+        int oldCount = item.getLikeCount();
+
+        boolean newState = !oldState;
+        item.setLikedByMe(newState);             // ✅ likedByMe 갱신
+
 
         // UI 즉시 반영 (optimistic update)
         holder.likeButton.setImageResource(

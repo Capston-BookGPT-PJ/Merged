@@ -264,7 +264,7 @@ public class FeedDetailActivity extends AppCompatActivity {
         reviewDate.setText(feed.getReviewDate());
         commentCount.setText(String.valueOf(feed.getCommentCount()));
         likeCount.setText(String.valueOf(feed.getLikeCount()));
-        likeButton.setImageResource(feed.isLiked() ? R.drawable.feed_like_full : R.drawable.feed_like_button);
+        likeButton.setImageResource(feed.isLikedByMe() ? R.drawable.feed_like_full : R.drawable.feed_like_button);
 
         // 프로필 이미지
         if (feed.getProfileImageUrl() != null && !feed.getProfileImageUrl().isEmpty()) {
@@ -460,8 +460,13 @@ public class FeedDetailActivity extends AppCompatActivity {
     private void toggleLike() {
         if (currentFeed == null) return;
 
-        boolean newState = !currentFeed.isLiked();
-        currentFeed.setLiked(newState);
+        //boolean newState = !currentFeed.isLiked();
+        //currentFeed.setLiked(newState);
+        boolean oldState = currentFeed.isLikedByMe(); // ✅ 기존 상태
+        int oldCount = currentFeed.getLikeCount();    // ✅ 기존 카운트 저장
+
+        boolean newState = !oldState;
+        currentFeed.setLikedByMe(newState); // ✅ likedByMe로 변경
 
         // UI 즉시 반영
         likeButton.setImageResource(newState ? R.drawable.feed_like_full : R.drawable.feed_like_button);
@@ -492,7 +497,8 @@ public class FeedDetailActivity extends AppCompatActivity {
     private void rollbackLike(boolean correctState) {
         if (currentFeed == null) return;
 
-        currentFeed.setLiked(correctState);
+        //currentFeed.setLiked(correctState);
+        currentFeed.setLikedByMe(correctState); // ✅ likedByMe 복원
         likeButton.setImageResource(correctState ? R.drawable.feed_like_full : R.drawable.feed_like_button);
 
         // UI 즉시 반영

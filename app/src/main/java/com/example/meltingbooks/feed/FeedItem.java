@@ -11,7 +11,7 @@ public class FeedItem implements Serializable {
     private String tagId;
     private String reviewContent;//감상문
     private String reviewDate;//작성 날짜
-    private boolean liked; //좋아요 하트 모양 표시
+    //private boolean liked; //좋아요 하트 모양 표시
 
     private String imageUrl;  // 이미지 URL 추가
 
@@ -39,6 +39,10 @@ public class FeedItem implements Serializable {
     private Integer rating;
 
     private String shareUrl; //⭐추가
+
+    private boolean likedByMe;
+    private List<String> likedUsers;
+
 
 
     public FeedItem(String userName, String reviewContent, String reviewDate,
@@ -85,7 +89,7 @@ public class FeedItem implements Serializable {
     //별점 추가 버전
     public FeedItem(String userName, String reviewContent, String reviewDate,
                     String imageUrl, String profileImageUrl, Integer bookId,
-                    int commentCount, int likeCount, String tagId, List<String> hashtags, Integer rating) {
+                    int commentCount, int likeCount, String tagId, List<String> hashtags, Integer rating, int userId) {
         this.userName = userName;
         this.reviewContent = reviewContent;
         this.reviewDate = reviewDate;
@@ -97,6 +101,7 @@ public class FeedItem implements Serializable {
         this.tagId = tagId;
         this.hashtags = hashtags;
         this.rating = rating;
+        this.userId = userId;
     }
 
     // 브라우징 리뷰 생성자
@@ -205,8 +210,8 @@ public class FeedItem implements Serializable {
         this.likeCount = likeCount;
     }
 
-    public boolean isLiked() { return liked; }
-    public void setLiked(boolean liked) { this.liked = liked; }
+    /*public boolean isLiked() { return liked; }
+    public void setLiked(boolean liked) { this.liked = liked; }*/
     public Book getBook() {
         return book;
     }
@@ -245,5 +250,13 @@ public class FeedItem implements Serializable {
     public void setShareUrl(String shareUrl) { //⭐추가
         this.shareUrl = shareUrl;
     }
+
+    // ✅ likedByMe Getter/Setter
+    public boolean isLikedByMe() { return likedByMe; }
+    public void setLikedByMe(boolean likedByMe) { this.likedByMe = likedByMe; }
+
+    // ✅ likedUsers Getter/Setter
+    public List<String> getLikedUsers() { return likedUsers; }
+    public void setLikedUsers(List<String> likedUsers) { this.likedUsers = likedUsers; }
 
 }

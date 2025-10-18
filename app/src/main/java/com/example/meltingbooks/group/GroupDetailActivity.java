@@ -410,8 +410,11 @@ public class GroupDetailActivity extends AppCompatActivity {
     private void toggleLike() {
         if (currentFeed == null) return;
 
-        boolean newState = !currentFeed.isLikedByMe();
-        currentFeed.setLikedByMe(newState);
+        boolean oldState = currentFeed.isLikedByMe(); // ✅ 기존 상태
+        int oldCount = currentFeed.getLikeCount();    // ✅ 기존 카운트 저장
+
+        boolean newState = !oldState;
+        currentFeed.setLikedByMe(newState); // ✅ likedByMe로 변경
 
         // UI 즉시 반영
         likeButton.setImageResource(newState ? R.drawable.feed_like_full : R.drawable.feed_like_button);
@@ -453,20 +456,5 @@ public class GroupDetailActivity extends AppCompatActivity {
         likeCount.setText(String.valueOf(correctedCount));
     }
 
-    /*
-    //피드 갱신
-    private final ActivityResultLauncher<Intent> feedEditLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    GroupFeedPageResponse updatedFeed = (GroupFeedPageResponse) result.getData().getSerializableExtra("updatedFeed");
-                    if (updatedFeed != null) {
-                        // FeedActivity로 전달
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("updatedFeed", updatedFeed);
-                        setResult(RESULT_OK, resultIntent);
-                        finish();
-                    }
-                }
-            });*/
 
 }

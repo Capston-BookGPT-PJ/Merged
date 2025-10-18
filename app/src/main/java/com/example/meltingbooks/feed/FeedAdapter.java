@@ -86,8 +86,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
 
         // 초기 상태 (좋아요 여부에 따라 이미지 설정)
-        holder.likeButton.setImageResource(
+        /*holder.likeButton.setImageResource(
                 item.isLiked() ? R.drawable.feed_like_full : R.drawable.feed_like_button
+        );*/
+        holder.likeButton.setImageResource(
+                item.isLikedByMe() ? R.drawable.feed_like_full : R.drawable.feed_like_button
         );
         holder.likeCount.setText(String.valueOf(item.getLikeCount()));
 
@@ -235,13 +238,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         //더보기
         holder.readMore.setOnClickListener(v -> {
-            /*
-            Context context = v.getContext();
-            Intent intent = new Intent(v.getContext(), FeedDetailActivity.class);
-            intent.putExtra("postId", item.getPostId());
-            detailLauncher.launch(intent);
-
-             */
             Context context = v.getContext();
             Intent intent = new Intent(context, FeedDetailActivity.class);
             intent.putExtra("feedItem", item); // FeedItem 전달
@@ -315,8 +311,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
         ApiService apiService = ApiClient.getClient(token).create(ApiService.class);
 
-        boolean newState = !item.isLiked(); // 토글
-        item.setLiked(newState);
+       // boolean newState = !item.isLiked(); // 토글
+       // item.setLiked(newState);
+
+        boolean oldState = item.isLikedByMe();   // ✅ 기존 상태
+        int oldCount = item.getLikeCount();
+
+        boolean newState = !oldState;
+        item.setLikedByMe(newState);             // ✅ likedByMe 갱신
 
         // UI 즉시 반영 (optimistic update)
         holder.likeButton.setImageResource(
@@ -357,8 +359,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     }
 
-    private void rollbackLike(FeedViewHolder holder, FeedItem item, boolean correctState) {
-        item.setLiked(correctState);
+    private void rollbackLike(FeedViewHolder holder, FeedItem item,boolean correctState) {
+        //item.setLiked(correctState);
+
+        item.setLikedByMe(correctState);
 
         holder.likeButton.setImageResource(
                 correctState ? R.drawable.feed_like_full : R.drawable.feed_like_button

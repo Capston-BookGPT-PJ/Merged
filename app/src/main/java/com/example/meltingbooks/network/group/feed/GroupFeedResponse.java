@@ -47,6 +47,7 @@ public class GroupFeedResponse implements Serializable {
         private String bookTitle;
         private String shareUrl;
 
+
         //추가
         // Post 클래스
         private String title;

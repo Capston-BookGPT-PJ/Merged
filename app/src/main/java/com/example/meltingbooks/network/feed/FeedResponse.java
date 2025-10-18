@@ -26,7 +26,7 @@ public class FeedResponse  implements Serializable {
 
 
     // 추가 필드
-    private boolean liked;
+    //private boolean liked;
     private Book book; // FeedDetailActivity에서 캐싱용
 
 
@@ -34,6 +34,10 @@ public class FeedResponse  implements Serializable {
     private int commentId;          // 댓글 고유 ID
     private String commentContent;  // 댓글 내용
     private String commentCreatedAt; // 댓글 작성 시간
+
+    // ✅ 추가된 필드
+    private boolean likedByMe;          // JSON의 likedByMe
+    private List<LikedUser> likedUsers;    // JSON의 likedUsers
 
 
     // Getter
@@ -68,8 +72,8 @@ public class FeedResponse  implements Serializable {
     public String getNickname() { return nickname; }
 
     // --- liked Getter/Setter ---
-    public boolean isLiked() { return liked; }
-    public void setLiked(boolean liked) { this.liked = liked; }
+    /*public boolean isLiked() { return liked; }
+    public void setLiked(boolean liked) { this.liked = liked; }*/
 
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
@@ -146,5 +150,27 @@ public class FeedResponse  implements Serializable {
         this.shareUrl = shareUrl;
     }
 
+    // ✅ likedByMe Getter/Setter
+    public boolean isLikedByMe() { return likedByMe; }
+    public void setLikedByMe(boolean likedByMe) { this.likedByMe = likedByMe; }
 
+    // ✅ likedUsers Getter/Setter
+    public static class LikedUser {
+        private int id;
+        private String nickname;
+        private String profileImageUrl;
+
+        // Getter & Setter
+        public int getId() { return id; }
+        public void setId(int id) { this.id = id; }
+        public String getNickname() { return nickname; }
+        public void setNickname(String nickname) { this.nickname = nickname; }
+        public String getProfileImageUrl() { return profileImageUrl; }
+        public void setProfileImageUrl(String profileImageUrl) { this.profileImageUrl = profileImageUrl; }
+    }
+
+    public List<LikedUser> getLikedUsers() { return likedUsers; }
+    public void setLikedUsers(List<LikedUser> likedUsers) { this.likedUsers = likedUsers; }
 }
+
+
