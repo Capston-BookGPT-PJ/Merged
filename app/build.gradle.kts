@@ -116,6 +116,9 @@ dependencies {
 
     //애니메이션 적용
     implementation ("com.airbnb.android:lottie:6.0.1")
+
+    //이미지 확대
+    implementation ("com.google.android.material:material:1.11.0")
 }
 
 // Firebase 설정 적용

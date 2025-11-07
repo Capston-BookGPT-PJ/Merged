@@ -48,12 +48,17 @@ import com.example.meltingbooks.network.book.BookController;
 
 
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import java.util.Date;
+
 
 public class CalendarContentFragment extends Fragment {
     public CalendarContentFragment() { }
@@ -74,6 +79,11 @@ public class CalendarContentFragment extends Fragment {
     private BookController bookController;
     private GrowthController growthController;
 
+    //기록이 있는 날짜 캘린더에 표시
+    private Set<Integer> loggedDays = new HashSet<>();
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,8 +100,12 @@ public class CalendarContentFragment extends Fragment {
         calendarGrid = view.findViewById(R.id.calendarGrid);
         textMonth = view.findViewById(R.id.textMonth);
 
+
         currentCalendar = Calendar.getInstance();
         updateCalendar(view);
+
+
+
         // 오늘 날짜로 초기화
         SimpleDateFormat format = new SimpleDateFormat("M/d (E)", Locale.KOREA);
         TextView goalByDate = view.findViewById(R.id.goal_by_date);
@@ -155,6 +169,9 @@ public class CalendarContentFragment extends Fragment {
 
         // 책 리스트 UI 생성
         setupBooks(view);
+
+        //이번 달 기록 조회
+        loadLoggedDaysOfMonth(view);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
         String todayStr = sdf.format(selectedDate.getTime());
@@ -232,6 +249,8 @@ public class CalendarContentFragment extends Fragment {
             dayView.setGravity(Gravity.CENTER);
             dayView.setTextColor(Color.BLACK);
 
+            cellLayout.addView(dayView);
+
             // ConstraintLayout 안에 넣기 위한 파라미터
             /**ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
              0, 0
@@ -255,10 +274,40 @@ public class CalendarContentFragment extends Fragment {
             params.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
             dayView.setLayoutParams(params);
 
-            cellLayout.addView(dayView);
+
+            // ✅ 작은 점(기록 표시용) 추가
+            View dotView = new View(getContext());
+            dotView.setId(View.generateViewId());
+
+            int dotSize = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 6, getResources().getDisplayMetrics()
+            );
+
+            ConstraintLayout.LayoutParams dotParams =
+                    new ConstraintLayout.LayoutParams(dotSize, dotSize);
+
+            // ✅ 셀의 '아래쪽 중앙'에 고정 → 무조건 보임
+            dotParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            dotParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            dotParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+            dotParams.bottomMargin = 6;
+
+            dotView.setLayoutParams(dotParams);
+
+            // ✅ 동그라미 + 연한 하늘색
+            dotView.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.dot_logged_date));
+            dotView.setVisibility(View.GONE);
+
+            cellLayout.addView(dotView);
 
             Calendar thisDate = Calendar.getInstance();
             thisDate.set(year, month, day);
+
+            // ✅ 기록 있는 날짜 표시 (여기 추가)
+            if (loggedDays.contains(day)) {
+                dotView.setVisibility(View.VISIBLE);
+            }
+
 
             // ✅ 선택된 날짜 배경
             if (thisDate.get(Calendar.YEAR) == selectedDate.get(Calendar.YEAR)
@@ -594,5 +643,63 @@ public class CalendarContentFragment extends Fragment {
             }
         });
     }
+
+    //달력에 기록있는 날 표시
+    // ✅ 해당 월에 독서 기록이 있는 날을 Set에 저장
+    private void loadLoggedDaysOfMonth(View view) {
+        loggedDays.clear();
+
+        int year = currentCalendar.get(Calendar.YEAR);
+        int month = currentCalendar.get(Calendar.MONTH);
+
+        Calendar startCal = Calendar.getInstance();
+        startCal.set(year, month, 1);
+
+        Calendar endCal = Calendar.getInstance();
+        endCal.set(year, month, startCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+
+        String startStr = sdf.format(startCal.getTime());
+        String endStr = sdf.format(endCal.getTime());
+
+        logController.getLogsByPeriod(token, userId, startStr, endStr,
+                new Callback<ApiResponse<List<ReadingLogResponse>>>() {
+
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<ReadingLogResponse>>> call,
+                                           Response<ApiResponse<List<ReadingLogResponse>>> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<ReadingLogResponse> logs = response.body().getData();
+
+                            if (logs != null) {
+                                for (ReadingLogResponse log : logs) {
+                                    String dateStr = log.getReadAt().substring(0, 10);
+
+                                    try {
+                                        java.util.Date d = sdf.parse(dateStr);
+                                        Calendar c = Calendar.getInstance();
+                                        c.setTime(d);
+                                        int day = c.get(Calendar.DAY_OF_MONTH);
+                                        loggedDays.add(day);
+                                    } catch (Exception ignored) {}
+                                }
+                            }
+                        }
+
+                        // ✅ 기록 다 받은 후 달력 다시 업데이트
+                        if (view != null) updateCalendar(view);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<ReadingLogResponse>>> call, Throwable t) {
+                        Log.e("Calendar", "달 기록 조회 실패", t);
+                        if (view != null) updateCalendar(view);
+                    }
+                });
+    }
+
+
 
 }

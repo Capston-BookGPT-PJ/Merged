@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -71,7 +73,7 @@ public class BrowseBookAdapter extends RecyclerView.Adapter<BrowseBookAdapter.Bo
         params.height = heightPx;
         holder.bookCoverImage.setLayoutParams(params);
 
-        // Glide 옵션
+        /*// Glide 옵션
         RequestOptions requestOptions = new RequestOptions()
                 .override(widthPx, heightPx)
                 .transform(new CenterCrop(), new RoundedCorners(cornerRadiusPx));
@@ -82,7 +84,31 @@ public class BrowseBookAdapter extends RecyclerView.Adapter<BrowseBookAdapter.Bo
                 .apply(requestOptions)
                 .format(DecodeFormat.PREFER_ARGB_8888)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(holder.bookCoverImage);
+                .into(holder.bookCoverImage);*/
+        RequestOptions requestOptions = new RequestOptions()
+                .override(widthPx, heightPx)
+                .transform(new FitCenter(), new RoundedCorners(cornerRadiusPx));
+
+        if (book.getCover() == null || book.getCover().isEmpty()) {
+            // 로컬 기본 이미지
+            Glide.with(context)
+                    .load(R.drawable.book_image_1)
+                    .apply(requestOptions)
+                    .into(holder.bookCoverImage);
+        } else {
+            // 외부 URL 안전 로딩
+            GlideUrl glideUrl = new GlideUrl(book.getCover(),
+                    new LazyHeaders.Builder()
+                            .addHeader("User-Agent", "Mozilla/5.0")
+                            .build());
+
+            Glide.with(context)
+                    .load(glideUrl)
+                    .apply(requestOptions)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .format(DecodeFormat.PREFER_ARGB_8888)
+                    .into(holder.bookCoverImage);
+        }
     }
 
     @Override

@@ -343,7 +343,8 @@ public class FeedWriteActivity extends AppCompatActivity {
             // 책 검색 레이아웃을 보이거나 숨기는 로직
             if (feedBookSearch.getVisibility() == View.GONE) {
                 feedBookSearch.setVisibility(View.VISIBLE);
-                ratingBar.setVisibility(View.VISIBLE);
+                // ✅ 책 선택 전이므로 숨겨둠
+                ratingBar.setVisibility(View.GONE);
                 // 뷰 초기화 및 리스너 등록 메서드 호출
                 initializeBookSearchViews();
             } else {
@@ -946,6 +947,8 @@ public class FeedWriteActivity extends AppCompatActivity {
             rvSearchResults = feedBookSearch.findViewById(R.id.rvSearchResults);
             bookInfoSelected = feedBookSearch.findViewById(R.id.bookInfoSelected);
 
+
+
             // bookInfoSelected도 null 체크를 하는 것이 안전합니다.
             if (bookInfoSelected != null) {
                 bookInfoTitle = bookInfoSelected.findViewById(R.id.bookInfoTitle);
@@ -962,12 +965,19 @@ public class FeedWriteActivity extends AppCompatActivity {
             rvSearchResults.setLayoutManager(new LinearLayoutManager(this));
             rvSearchResults.setAdapter(bookAdapter);
 
+            // 초기에는 안 보이게 숨김
+            rvSearchResults.setVisibility(View.GONE);
+            bookInfoSelected.setVisibility(View.GONE);
+
+
 
             // 책 검색 버튼 클릭 리스너
             searchBook.setOnClickListener(v -> {
                 if (bookInfoSelected != null) bookInfoSelected.setVisibility(View.GONE);
                 String query = etBookTitle.getText().toString().trim();
                 rvSearchResults.setVisibility(View.VISIBLE);
+                // ✅ 검색 중이므로 별점 숨김
+                ratingBar.setVisibility(View.GONE);
 
                 if (!query.isEmpty()) {
                     bookController.searchBooks(query, new Callback<BookResponse>() {
@@ -1001,6 +1011,8 @@ public class FeedWriteActivity extends AppCompatActivity {
 
                 rvSearchResults.setVisibility(View.GONE);
                 bookInfoSelected.setVisibility(View.VISIBLE);
+                // ✅ 책 선택했으니 이제 별점 보여도 됨!
+                ratingBar.setVisibility(View.VISIBLE);
 
                 // 2️⃣ 서버에 Book 생성 요청
                 createBookOnServer(book);

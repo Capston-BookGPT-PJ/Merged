@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.meltingbooks.R;
+import com.example.meltingbooks.feed.FullscreenImageFragment;
 import com.example.meltingbooks.group.LikedUsersBottomSheet;
 import com.example.meltingbooks.group.comment.GroupCommentBottomSheet;
 import com.example.meltingbooks.network.ApiClient;
@@ -121,14 +122,28 @@ public class GroupFeedAdapter extends RecyclerView.Adapter<GroupFeedAdapter.Grou
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
             holder.groupImage.setVisibility(View.VISIBLE);
             List<String> images = item.getImageUrls();
-            String latestImage = images.get(images.size() - 1); // ✅ 마지막 이미지 선택
+            String latestImage = images.get(images.size() - 1);
+
             Glide.with(context)
                     .load(latestImage)
                     .centerCrop()
                     .into(holder.groupImage);
+
+            // ✅ 전체 화면 이미지 프래그먼트 표시
+            holder.groupImage.setOnClickListener(v -> {
+                FullscreenImageFragment fragment =
+                        FullscreenImageFragment.newInstance(latestImage);
+
+                fragment.show(
+                        ((AppCompatActivity) v.getContext()).getSupportFragmentManager(),
+                        "FullscreenImageFragment"
+                );
+            });
+
         } else {
             holder.groupImage.setVisibility(View.GONE);
         }
+
 
 
 
@@ -157,21 +172,25 @@ public class GroupFeedAdapter extends RecyclerView.Adapter<GroupFeedAdapter.Grou
         holder.userName.setOnClickListener(profileClickListener);
 
 
-        // 더보기 클릭
-        holder.readMore.setOnClickListener(v -> {
+        //상세 화면 이동
+        holder.root.setOnClickListener(v -> {
             Context context = v.getContext();
             Intent intent = new Intent(context, GroupDetailActivity.class);
-            intent.putExtra("groupFeedItem", item); // groupFeedItem 전달
-            intent.putExtra("groupId", item.getGroupId());  // groupId 전달
-            intent.putExtra("postId", item.getPostId());    // ✅ postId 추가
+
+            intent.putExtra("groupFeedItem", item);
+            intent.putExtra("groupId", item.getGroupId());
+            intent.putExtra("postId", item.getPostId());
+
             context.startActivity(intent);
-            // 로그로 확인
-            Log.d("ReadMoreClick", "groupFeedItem postId=" + item.getPostId());
-            // 로그 확인
-            Log.d("ReadMoreClick", "groupFeedItem: " + item.toString());
-            Log.d("ReadMoreClick", "groupId: " + item.getGroupId());
-            Log.d("ReadMoreClick", "postId: " + item.getPostId()); // ✅ 로그 추가
+
+            Log.d("RootClick", "groupFeedItem postId=" + item.getPostId());
+            Log.d("RootClick", "groupFeedItem: " + item.toString());
+            Log.d("RootClick", "groupId: " + item.getGroupId());
+            Log.d("RootClick", "postId: " + item.getPostId());
         });
+
+        //더보기
+        holder.readMore.setOnClickListener(v -> holder.root.performClick());
 
 
     }
@@ -182,12 +201,14 @@ public class GroupFeedAdapter extends RecyclerView.Adapter<GroupFeedAdapter.Grou
     }
 
     static class GroupFeedViewHolder extends RecyclerView.ViewHolder {
+        View root;
         ImageView profileImage, groupImage, commentButton, likeButton;
         TextView userName, writeDate, title, content, commentCount, likeCount;
         TextView readMore;
 
         public GroupFeedViewHolder(@NonNull View itemView) {
             super(itemView);
+            root = itemView.findViewById(R.id.groupFeedItemRoot); // ✅ 루트 가져오기
             profileImage = itemView.findViewById(R.id.profileImage);
             groupImage = itemView.findViewById(R.id.groupImage);
             userName = itemView.findViewById(R.id.userName);

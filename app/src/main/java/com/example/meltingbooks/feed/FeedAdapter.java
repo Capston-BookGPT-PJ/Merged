@@ -200,14 +200,27 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         });
 
         // 이미지 표시
-        List<String> images = item.getImageUrls(); // FeedItem에 List<String> imageUrls getter 필요
+        List<String> images = item.getImageUrls();
         if (images != null && !images.isEmpty()) {
             h.feedImage.setVisibility(View.VISIBLE);
-            String latestImage = images.get(images.size() - 1); // 최신 이미지 선택
+            final String latestImage = images.get(images.size() - 1);  // ✅ final 지정
             Glide.with(context).load(latestImage).into(h.feedImage);
+
+            // ✅ 이미지 전체화면 프래그먼트로 표시
+            h.feedImage.setOnClickListener(v -> {
+                FullscreenImageFragment fragment =
+                        FullscreenImageFragment.newInstance(latestImage);
+
+                fragment.show(
+                        ((AppCompatActivity) context).getSupportFragmentManager(),
+                        "FullscreenImageFragment"
+                );
+            });
+
         } else {
             h.feedImage.setVisibility(View.GONE);
         }
+
 
 
         // 프로필 표시
@@ -254,6 +267,25 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         h.bookCategory.setText(book.getCategoryName());
 
                         Glide.with(context).load(book.getCover()).into(h.bookCover);
+
+                        // ✅✅✅ 알라딘 링크 이동 기능 추가
+                        String aladinUrl = book.getLink();   // ⭐ book.link 사용
+
+                        View.OnClickListener openAladin = v -> {
+                            if (aladinUrl != null && !aladinUrl.isEmpty()) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(aladinUrl));
+                                context.startActivity(intent);
+                            } else {
+                                Toast.makeText(context, "이 책의 링크가 제공되지 않았습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        };
+
+                        // 책 정보 전체 클릭 가능
+                        h.bookInfoLayout.setOnClickListener(openAladin);
+
+                        // 책 표지 클릭해도 이동
+                        h.bookCover.setOnClickListener(openAladin);
+
                     } else {
                         Log.e("BookDetail", "실패 코드: " + response.code());
                         h.bookInfoLayout.setVisibility(View.GONE);
@@ -290,13 +322,16 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
 
-        //더보기
-        h.readMore.setOnClickListener(v -> {
-            Context context = v.getContext();
+        // ✅ 전체 카드 클릭 → 상세 이동
+        h.root.setOnClickListener(v -> {
             Intent intent = new Intent(context, FeedDetailActivity.class);
-            intent.putExtra("feedItem", item); // FeedItem 전달
-            context.startActivity(intent);      // 그냥 startActivity 사용
+            intent.putExtra("feedItem", item);
+            detailLauncher.launch(intent);
         });
+
+        // ✅ readMore 클릭 → 전체 클릭처럼 동작
+        h.readMore.setOnClickListener(v -> h.root.performClick());
+
     }
 
     static class RecommendViewHolder extends RecyclerView.ViewHolder {
@@ -315,6 +350,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public static class FeedViewHolder extends RecyclerView.ViewHolder {
+        View root; // ✅ 추가
         TextView userName, reviewContent, reviewDate, commentCount, likeCount;
         ImageView commentButton, shareButton, feedImage, profileImage, likeButton;
         //LinearLayout voteLayout;
@@ -333,6 +369,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
+            root = itemView.findViewById(R.id.feedItemRoot); // ✅ 루트 가져오기
             userName = itemView.findViewById(R.id.userName);
             reviewContent = itemView.findViewById(R.id.reviewContent);
             reviewDate = itemView.findViewById(R.id.reviewDate);

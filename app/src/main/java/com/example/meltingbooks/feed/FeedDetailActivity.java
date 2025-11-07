@@ -337,6 +337,24 @@ public class FeedDetailActivity extends AppCompatActivity {
                         bookPublisher.setText(book.getPublisher());
                         bookCategory.setText(book.getCategoryName());
                         Glide.with(FeedDetailActivity.this).load(book.getCover()).into(bookCover);
+
+                        // ✅✅✅ 알라딘 링크 이동 기능 추가
+                        String aladinUrl = book.getLink();  // ⭐ book.link 사용
+
+                        View.OnClickListener openAladin = v -> {
+                            if (aladinUrl != null && !aladinUrl.isEmpty()) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(aladinUrl));
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(FeedDetailActivity.this, "이 책의 링크가 없습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        };
+
+                        // 전체 영역 클릭 가능
+                        bookInfoLayout.setOnClickListener(openAladin);
+                        // 표지 클릭해도 이동
+                        bookCover.setOnClickListener(openAladin);
+
                     } else {
                         bookInfoLayout.setVisibility(View.GONE);
                     }

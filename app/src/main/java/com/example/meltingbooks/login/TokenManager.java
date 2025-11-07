@@ -1,8 +1,11 @@
 package com.example.meltingbooks.login;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Base64;
+
+import com.example.meltingbooks.MyApp;
 
 import org.json.JSONObject;
 
@@ -80,5 +83,15 @@ public class TokenManager {
     // ✅ 콜백 인터페이스
     public interface TokenRefreshCallback {
         void onResult(boolean success);
+    }
+
+    //로그인 끊기면 다시 로그인
+    public static void forceLogout(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
     }
 }
